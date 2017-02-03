@@ -5,36 +5,32 @@ var gameProperties = {
 //"4p1d": {playerCount: 4, deckCount: 1 },
 }
 
-GameFactory.createGame = function(playersIds, gameType){
+GameFactory.createGame = function(playerIds, gameType){
   var deck    = createDeck(gameType),
-      players = createPlayers(playersIds); 
+      players = createPlayers(playerIds); 
 
   GameFactory.dealPlayers(players, deck);
-  var table = dealTable();
 
   return {
-    deck : deck,
+    //Maybe add a field for unique game id? 
+    deck: deck,
+    plays: [], //To record past plays
+    playerIds,
     players: players,
-    table: table,
-    currentTurn: playersIds,
     gameType: gameType,
-    inProgress: true,     // future 
-    started: new Date()   // future
+    inProgress: true,     // future
+    started: new Date(),   // future
+    finished: -1
   };
 };
 
 
 GameFactory.dealPlayers = function(players, deck){
-  for (var i = 0; i < deck.length; i++){ 
+  for (var i = 0; i < deck.length - 8; i++){  //8 for the bottom
     Object.keys(players).forEach(function(id){
       players[id].hand.push(deck.shift()); // eventually will want to add in some delay logic
     });
   }
-}
-
-function dealTable(){
-  // return null object
-  return null;
 }
 
 function createPlayers(ids){
@@ -43,7 +39,7 @@ function createPlayers(ids){
   ids.forEach(function(id){
     o[id] = {
       hand  : [],
-      points: 0;
+      points: 0
       //card  : [], // what card are they on, probably game-level
     };
   });
@@ -57,7 +53,7 @@ function createDeck(gameType){
   var cards = [];
 
   // # of decks
-  for (var j = 1: j <= gameProperties.gameType.deckCount; j++) { 
+  for (var j = 1; j <= gameProperties[gameType].deckCount; j++) { 
 
     // for each suit in a deck
     suits.forEach(function(suit){
