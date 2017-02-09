@@ -45,7 +45,7 @@ class App extends Component {
             console.log(game)
             console.log(this.props.currentUser)
             return game.players[this.props.currentUser._id].hand.map((card) => (
-               <Card key={card.suit + card.value} card={card} toggleToPlay={this.toggleToPlay}/>
+               <Card key={card.id} card={card} toggleToPlay={this.toggleToPlay}/>
             ));
         }
     }

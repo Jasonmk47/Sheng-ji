@@ -12,5 +12,4 @@ Click start game
 
 You should see your starting hand
 
-
-Also note there is a bug that we cannot show pairs since the cards are the same. We should add an overall id to each individual card to stop this problem.
+Cards now dealt properly

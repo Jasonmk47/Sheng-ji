@@ -24,9 +24,8 @@ GameFactory.createGame = function(playerIds, gameType){
   };
 };
 
-
 GameFactory.dealPlayers = function(players, deck){
-  for (var i = 0; i < deck.length - 8; i++){  //8 for the bottom
+  for (var i = 0; i < deck.length - 8; i){  //8 for the bottom. Don't increment the for loop
     Object.keys(players).forEach(function(id){
       players[id].hand.push(deck.shift()); // eventually will want to add in some delay logic
     });
@@ -53,6 +52,8 @@ function createDeck(gameType){
   var cards = [];
 
   // # of decks
+  let index = 0;
+
   for (var j = 1; j <= gameProperties[gameType].deckCount; j++) { 
 
     // for each suit in a deck
@@ -64,6 +65,7 @@ function createDeck(gameType){
         if (i === 12) name = 'Q';
         if (i === 13) name = 'K';
         cards.push({
+          id: index++,
           suit: suit,
           value: i,
           name: name
@@ -73,11 +75,13 @@ function createDeck(gameType){
 
     // jokers
     cards.push({
+      id: index++,
       suit: trumpSuit,
       value: 14,
       name: 'SJ'
     });
     cards.push({
+      id: index++,
       suit: trumpSuit,
       value: 15,
       name: 'BJ'
