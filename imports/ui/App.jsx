@@ -8,6 +8,7 @@ import { Games } from '../api/games.js';
 import Card from './Card.jsx';
 import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 
+
 // App component - represents the whole app
 class App extends Component {
 
@@ -21,20 +22,26 @@ class App extends Component {
             currentGameId: -1, //No current game
             selectedUsers: [], //TODO: For making games. Not used currently
         };
+
+        this.toggleToPlay = this.toggleToPlay.bind(this);
     }
 
     toggleToPlay(card) {
         //TODO: If not logical card reject here and return false
-
-
-        var index = this.play.indexOf(card)
+        var index = this.state.play.indexOf(card)
 
         if (index > -1)
-            this.play.push(card);
+            this.state.play.push(card);
         else
-            this.play.splice(index, 1);
+            this.state.play.splice(index, 1);
+
+        console.log(this.state.play);
+
         return true;
     }
+
+
+
 
     //TODO: sort the cards by suit
     renderCards(){
@@ -46,7 +53,24 @@ class App extends Component {
             console.log(this.props.currentUser)
             return game.players[this.props.currentUser._id].hand.map((card) => (
                <Card key={card.id} card={card} toggleToPlay={this.toggleToPlay}/>
-            ));
+            )).sort(
+                function (x, y) {
+                    //I wanted this to be a helper function but didnt feel like figuring out how to do it rn
+                    if ((game.trumpSuit !== x.props.card.suit || x.props.card.suit !== "Trump") && (game.trumpSuit === y.props.card.suit || x.props.card.suit === "Trump"))
+                        return -1;
+
+                    if ((game.trumpSuit === x.props.card.suit || x.props.card.suit === "Trump") && (game.trumpSuit !== y.props.card.suit || x.props.card.suit !== "Trump"))
+                        return 1;
+
+                    //Relies on the fact that trump order is alphabetical and t is after s
+                    if (x.props.card.suit < y.props.card.suit)
+                        return -1;
+                    if (x.props.card.suit > y.props.card.suit)
+                        return 1;
+                    
+                    return x.props.card.value - y.props.card.value;
+                }
+            );
         }
     }
 
@@ -83,7 +107,7 @@ class App extends Component {
     createGame(event){
         event.preventDefault();
 
-        //Hard coded to test Just make 4 accounts to try out
+        //Hard coded to test just make 4 accounts to try out
         const first = this.props.friends[1]._id;
         const second = this.props.friends[2]._id;
         const third = this.props.friends[3]._id;

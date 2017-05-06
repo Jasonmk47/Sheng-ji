@@ -1,4 +1,4 @@
-//Inspired by https://github.com/FalloutX/meteor-card-game/blob/master/games.js
+  //Inspired by https://github.com/FalloutX/meteor-card-game/blob/master/games.js
 
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
@@ -91,7 +91,6 @@ Meteor.methods({
     if (game.currentTurn[0] !== id && !Turns.inHand(hand, card)) return;
 
     /*TODO: Game logic here*/
-
 
 
 

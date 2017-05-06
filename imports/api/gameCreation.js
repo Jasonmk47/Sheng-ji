@@ -18,6 +18,7 @@ GameFactory.createGame = function(playerIds, gameType){
     playerIds,
     players: players,
     gameType: gameType,
+    trumpSuit: "Trump",
     inProgress: true,     // future
     started: new Date(),   // future
     finished: -1
@@ -54,13 +55,13 @@ function createDeck(gameType){
   // # of decks
   let index = 0;
 
-  for (var j = 1; j <= gameProperties[gameType].deckCount; j++) { 
-
+  for (var j = 1; j <= gameProperties[gameType].deckCount; j++) {
     // for each suit in a deck
+    //Ace is 14 for value ordering
     suits.forEach(function(suit){
-      for (var i=1; i<=13; i++){
+      for (var i=2; i<=14; i++){
         var name = i;
-        if (i === 1)  name = 'A';
+        if (i === 14)  name = 'A';
         if (i === 11) name = 'J';
         if (i === 12) name = 'Q';
         if (i === 13) name = 'K';
