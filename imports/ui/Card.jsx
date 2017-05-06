@@ -31,7 +31,7 @@ export default class Card extends Component {
 			<div
 				className={cardClassName}
 				onClick={this.toggleSelected.bind(this)}>
-				{this.props.card.name} of {this.props.card.suit} with {this.props.card.id}
+				{this.props.card.name} of {this.props.card.suit} id: {this.props.card.id}
 			</div>
 		);
 	}

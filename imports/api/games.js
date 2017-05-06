@@ -58,9 +58,12 @@ Meteor.methods({
     console.log("Game has been created.!");
   },
   'games.submit'(cards, gameId) {
+
     //https://forums.meteor.com/t/check-object-in-an-array/3355
+
     check(cards, Match.Where(function(cards){
       _.each(cards, function (doc) {
+
         /* do your checks and return false if there is a problem */
         if(!(doc.suits == 'Clubs' || doc.suits == 'Diamonds' 
           || doc.suits == 'Hearts' || doc.suits == 'Spades' 
@@ -91,8 +94,6 @@ Meteor.methods({
     if (game.currentTurn[0] !== id && !Turns.inHand(hand, card)) return;
 
     /*TODO: Game logic here*/
-
-
 
     game.players[id].hand = Turns.removeCard(card, hand);
     game.currentTurn.unshift(game.currentTurn.pop());

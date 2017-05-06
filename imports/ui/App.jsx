@@ -22,7 +22,6 @@ class App extends Component {
             currentGameId: -1, //No current game
             selectedUsers: [], //TODO: For making games. Not used currently
         };
-
         this.toggleToPlay = this.toggleToPlay.bind(this);
     }
 
@@ -31,17 +30,12 @@ class App extends Component {
         var index = this.state.play.indexOf(card)
 
         if (index > -1)
-            this.state.play.push(card);
-        else
             this.state.play.splice(index, 1);
-
-        console.log(this.state.play);
+        else
+            this.state.play.push(card);
 
         return true;
     }
-
-
-
 
     //TODO: sort the cards by suit
     renderCards(){
@@ -49,8 +43,9 @@ class App extends Component {
         {
             const game = this.props.games.find( game => {if(game._id == this.state.currentGameId) return game;} );
 
-            console.log(game)
-            console.log(this.props.currentUser)
+            console.log(game);
+            console.log(this.props.currentUser);
+
             return game.players[this.props.currentUser._id].hand.map((card) => (
                <Card key={card.id} card={card} toggleToPlay={this.toggleToPlay}/>
             )).sort(
@@ -96,12 +91,11 @@ class App extends Component {
                 </label>
             </li>
         )});
-
     }
 
     submitHand(event){
         event.preventDefault();
-        Meteor.call('games.submit', this.state.play, currentGameId)
+        Meteor.call('games.submit', this.state.play, this.state.currentGameId);
     }
 
     createGame(event){
@@ -116,7 +110,7 @@ class App extends Component {
         console.log(second);
         console.log(third);
 
-        Meteor.call('games.createGame', first, second, third)
+        Meteor.call('games.createGame', first, second, third);
     }
 
     startGame(event){
