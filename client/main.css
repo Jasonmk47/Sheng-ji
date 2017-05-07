@@ -16,6 +16,11 @@ body {
  
   font-size: 14px;
 }
+
+.selected {
+  background-color: yellow;
+
+}
  
 .container {
   max-width: 600px;
