@@ -13,7 +13,7 @@ export default class Card extends Component {
 
 	// Switch the selected property    
 	toggleSelected() {
-		if (this.props.toggleToPlay(this))
+		if (this.props.toggleToPlay(this.props.card))
 	    	this.setState({selected: !this.state.selected});
 	    else
 	    	conosle.log("Invalid card combination");

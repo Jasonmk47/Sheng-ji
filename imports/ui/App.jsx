@@ -50,7 +50,6 @@ class App extends Component {
         var index = this.state.selectedUsers.indexOf(friend);
 
         if (index > -1) {
-
             this.setState((prevState) => ({
                 selectedUsers: prevState.selectedUsers.filter((_, i) => i !== index)
             })); 
@@ -65,8 +64,6 @@ class App extends Component {
                 this.setState(previousState => ({
                     selectedUsers: previousState.selectedUsers.concat(friend)
                 }));
-
-                console.log(friend);
             }
             else {
                 console.log(friend + " is yourself")
@@ -122,7 +119,15 @@ class App extends Component {
 
     submitHand(event){
         event.preventDefault();
-        Meteor.call('games.submit', this.state.play, this.state.currentGameId);
+
+        console.log(this.state.play);
+
+        if (this.state.play.length === 0) {
+            console.log("No cards in play")
+            return false;
+        }
+
+        Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser);
     }
 
     createGame(event){
