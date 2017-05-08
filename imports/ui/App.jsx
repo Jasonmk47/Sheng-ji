@@ -9,7 +9,6 @@ import Card from './Card.jsx';
 import FriendList from './FriendList.jsx';
 import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 
-
 // App component - represents the whole app
 class App extends Component {
 
@@ -36,7 +35,7 @@ class App extends Component {
             //http://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
             this.setState((prevState) => ({
                 play: prevState.play.filter((_, i) => i !== index)
-            })); 
+            }));
         }
         else {
             //http://stackoverflow.com/questions/26505064/react-js-what-is-the-best-way-to-add-a-value-to-an-array-in-state
@@ -51,6 +50,7 @@ class App extends Component {
         var index = this.state.selectedUsers.indexOf(friend);
 
         if (index > -1) {
+
             this.setState((prevState) => ({
                 selectedUsers: prevState.selectedUsers.filter((_, i) => i !== index)
             })); 
