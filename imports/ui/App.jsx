@@ -5,10 +5,9 @@ import { createContainer } from 'meteor/react-meteor-data';
 
 import { Games } from '../api/games.js';
 
-import Card from './Card.jsx';
+import Hand from './Hand.jsx';
 import FriendList from './FriendList.jsx';
 import AccountsUIWrapper from './AccountsUIWrapper.jsx';
-
 
 // App component - represents the whole app
 class App extends Component {
@@ -36,7 +35,7 @@ class App extends Component {
             //http://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
             this.setState((prevState) => ({
                 play: prevState.play.filter((_, i) => i !== index)
-            })); 
+            }));
         }
         else {
             //http://stackoverflow.com/questions/26505064/react-js-what-is-the-best-way-to-add-a-value-to-an-array-in-state
@@ -65,8 +64,6 @@ class App extends Component {
                 this.setState(previousState => ({
                     selectedUsers: previousState.selectedUsers.concat(friend)
                 }));
-
-                console.log(friend);
             }
             else {
                 console.log(friend + " is yourself")
@@ -77,35 +74,10 @@ class App extends Component {
         return true;
     }
 
-    //TODO: sort the cards by suit
-    renderCards(){
-        if(this.state.inGame)
-        {
-            const game = this.props.games.find( game => {if(game._id == this.state.currentGameId) return game;} );
-
-            console.log(game);
-            console.log(this.props.currentUser);
-
-            return game.players[this.props.currentUser._id].hand.map((card) => (
-               <Card key={card.id} card={card} toggleToPlay={this.toggleToPlay}/>
-            )).sort(
-                function (x, y) {
-                    //I wanted this to be a helper function but didnt feel like figuring out how to do it rn
-                    if ((game.trumpSuit !== x.props.card.suit || x.props.card.suit !== "Trump") && (game.trumpSuit === y.props.card.suit || x.props.card.suit === "Trump"))
-                        return -1;
-
-                    if ((game.trumpSuit === x.props.card.suit || x.props.card.suit === "Trump") && (game.trumpSuit !== y.props.card.suit || x.props.card.suit !== "Trump"))
-                        return 1;
-
-                    //Relies on the fact that trump order is alphabetical and t is after s
-                    if (x.props.card.suit < y.props.card.suit)
-                        return -1;
-                    if (x.props.card.suit > y.props.card.suit)
-                        return 1;
-                    
-                    return x.props.card.value - y.props.card.value;
-                }
-            );
+    renderHand(){
+        if(this.state.inGame) {
+            return <Hand gameId={this.state.currentGameId} games={this.props.games} 
+                    currentUser={this.props.currentUser} toggleToPlay={this.toggleToPlay}/>
         }
     }
 
@@ -122,7 +94,14 @@ class App extends Component {
 
     submitHand(event){
         event.preventDefault();
-        Meteor.call('games.submit', this.state.play, this.state.currentGameId);
+
+        console.log(this.state.play);
+        if (this.state.play.length === 0) {
+            console.log("No cards in play")
+            return false;
+        }
+ 
+        Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser);
     }
 
     createGame(event){
@@ -167,8 +146,8 @@ class App extends Component {
                 </header>
 
                 {this.state.inGame ? 
-                <div className="cards-in-hand">
-                    {this.renderCards()}
+                <div>
+                    {this.renderHand()}
                 </div>
                 :
                 <div className="start-game">
@@ -189,24 +168,25 @@ class App extends Component {
                         />
                     </form> 
                 :
-                    <form className="create-game" onSubmit={this.createGame.bind(this)}>
-                        <input
-                            type='submit'
-                            value="Create Game"
-                            name="create-game"
-                        />
-                    </form>
+                    <div>
+                        <form className="create-game" onSubmit={this.createGame.bind(this)}>
+                            <input
+                                type='submit'
+                                value="Create Game"
+                                name="create-game"
+                            />
+                        </form>
+                    
+
+                        <form className="start-game" onSubmit={this.startGame.bind(this)}>
+                            <input
+                                type='submit'
+                                value="Start Game"
+                                name="start-game"
+                            />
+                        </form>
+                    </div>
                 }
-
-                <form className="start-game" onSubmit={this.startGame.bind(this)}>
-                    <input
-                        type='submit'
-                        value="Start Game"
-                        name="start-game"
-                    />
-                </form>
-
-
             </div>
         );
     }
