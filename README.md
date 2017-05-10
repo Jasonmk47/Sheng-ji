@@ -3,16 +3,22 @@ Online version of Sheng-Ji or 80 points
 
 Getting started
 
+Download Meteor
+
+Download node
+
+meteor npm install
+
 Type the command 'meteor' in the parent folder to start the server.
 
 Make 4 users. (Sign up - Sign out repeatedly)
-	You will see the users appear in a list.
+You will see the users appear in a list.
 Click create a game. As of now, the game creation always takes the first 4 users in the db
-	You will see the gameID appear in the list
+You will see the gameID appear in the list
 Click start game
-	The list should disappear and the first game in the db will be loaded. ALl your cards should be listed
-	If you click on the cards (like on the text) they are queued so the submit button calls game functionality on them.
-	This needs to be animated.
+The list should disappear and the first game in the db will be loaded. ALl your cards should be listed
+If you click on the cards (like on the text) they are queued so the submit button calls game functionality on them.
+This needs to be animated.
 
 
 DB management
