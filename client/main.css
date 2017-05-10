@@ -18,7 +18,7 @@ body {
 }
 
 .selected {
-  background-color: yellow;
+  border: 5px solid #021a40;
 }
 
 .hand {
