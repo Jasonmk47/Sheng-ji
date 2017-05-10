@@ -22,16 +22,20 @@ export default class Card extends Component {
 
 	render() {
 	    // Give className to cards to highlight if selected
+	    var cid = this.props.card.id;
 	    const cardClassName = classnames({
 			selected: this.state.selected,
-			name: "card",
+			card: "card",
 	    });
 
 		return (
-			<div
-				className={cardClassName}
-				onClick={this.toggleSelected.bind(this)}>
-				{this.props.card.name} of {this.props.card.suit} id: {this.props.card.id}
+			<div>
+				<div
+					className={cardClassName + this.props.card.id}
+					onClick={this.toggleSelected.bind(this)}>
+					{this.props.card.name} of {this.props.card.suit} id: {this.props.card.id}
+				</div>
+				<img src={'3_of_clubs.png'}/>
 			</div>
 		);
 	}

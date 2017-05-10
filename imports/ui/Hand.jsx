@@ -40,10 +40,11 @@ export default class Hand extends Component {
 
 	render() {
 	    const handClassName = classnames({
+	    	hand: "hand",
 	    });
 
 		return (
-			<div id="hand" className={handClassName}>
+			<div className={handClassName}>
 				{this.renderCards()}
             </div>
 		);

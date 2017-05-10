@@ -57,25 +57,27 @@ Meteor.methods({
     Games.insert(game);
     console.log("Game has been created.!");
   },
-  'games.submit'(cards, gameId) {
+  'games.submit'(cards, gameId, userId) {
+
+    if (cards.length === 0)
+    {
+      console.log("no cards in this hand- Should be caught before here");
+      return false;
+    }
 
     //https://forums.meteor.com/t/check-object-in-an-array/3355
-
     check(cards, Match.Where(function(cards){
       _.each(cards, function (doc) {
-
         /* do your checks and return false if there is a problem */
         if(!(doc.suits == 'Clubs' || doc.suits == 'Diamonds' 
           || doc.suits == 'Hearts' || doc.suits == 'Spades' 
           || doc.suits == 'Trump')) {
           return false;
         }
-        if (doc.value < 0 || doc.value > 13){
+        if (doc.value < 1 || doc.value > 14){
           return false;
         }
         //TODO:check the name
-
-
       });
       // return true if there is no problem
       return true;
@@ -89,22 +91,22 @@ Meteor.methods({
     console.log(cards);
 
     var game = Games.findOne({_id: gameId});
-    var hand = game.players[id].hand;
+    // var hand = game.players[userId].hand;
 
-    if (game.currentTurn[0] !== id && !Turns.inHand(hand, card)) return;
+    // if (game.currentTurn[0] !== id && !Turns.inHand(hand, card)) return;
 
     /*TODO: Game logic here*/
 
-    game.players[id].hand = Turns.removeCard(card, hand);
-    game.currentTurn.unshift(game.currentTurn.pop());
+    // game.players[id].hand = Turns.removeCard(card, hand);
+    // game.currentTurn.unshift(game.currentTurn.pop());
 
-    if( allHandsEmpty(game.players)){
-      if( game.deck.length > 0){
-        GameFactory.dealPlayers(game.players, game.deck);
-      }else{
-        scoreGame(game);
-      }
-    }
+    // if( allHandsEmpty(game.players)){
+    //   if( game.deck.length > 0){
+    //     GameFactory.dealPlayers(game.players, game.deck);
+    //   }else{
+    //     scoreGame(game);
+    //   }
+    // }
     Games.update(gameId, game);
 
 
@@ -113,8 +115,8 @@ Meteor.methods({
 });
 
 
-function allHandsEmpty(players){
-  return _.every(players, function(player){
-    return player.hand.length === 0;
-  });
-}
+// function allHandsEmpty(players){
+//   return _.every(players, function(player){
+//     return player.hand.length === 0;
+//   });
+// }

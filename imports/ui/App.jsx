@@ -100,7 +100,6 @@ class App extends Component {
             console.log("No cards in play")
             return false;
         }
- 
         Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser);
     }
 
