@@ -19,7 +19,14 @@ body {
 
 .selected {
   background-color: yellow;
+}
 
+.hand {
+}
+
+.card {
+  width: 70px;
+  height: 110px;
 }
  
 .container {
