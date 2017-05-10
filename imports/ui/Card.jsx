@@ -35,7 +35,7 @@ export default class Card extends Component {
 					onClick={this.toggleSelected.bind(this)}>
 					{this.props.card.name} of {this.props.card.suit} id: {this.props.card.id}
 				</div>
-				<img src={'3_of_clubs.png'}/>
+				<img src={'/img/3_of_clubs.png'}/>
 			</div>
 		);
 	}
