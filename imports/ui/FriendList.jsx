@@ -11,7 +11,7 @@ export default class FriendList extends Component {
         };
     }
 
-	// Switch the selected property    
+	// Switch the selected property
 	toggleSelected(id) {
 		if (this.props.toggleToSelect(id)) {
 			if (_.contains(this.state.selected, id)) {

@@ -99,7 +99,7 @@ Meteor.methods({
 
     //Throw away cards that are done
     _.each(cards, function (card) {
-      hand = hand.map(function (card_i) {
+      game.players[userId].hand = game.players[userId].hand.map(function (card_i) {
         if (card_i.value === card.value && card_i.suit === card.suit && card_i.id === card.id ) {
           return;
         }
@@ -111,7 +111,7 @@ Meteor.methods({
       });
     });
 
-    console.log(hand);
+    console.log(game.players[userId].hand);
 
     //Put point cards into points won for player
 
@@ -126,9 +126,7 @@ Meteor.methods({
     // }
 
     //Does not properly update db
-    Games.update( gameId, {
-      $set: { hand: hand },
-    });
+    Games.update( gameId, game );
   },
 
 });
