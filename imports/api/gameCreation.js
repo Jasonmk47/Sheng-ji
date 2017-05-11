@@ -49,7 +49,7 @@ function createPlayers(ids){
 }
  
 function createDeck(gameType){
-  var suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
+  var suits = ['clubs', 'diamonds', 'hearts', 'spades'];
   var trumpSuit = /* Donald */ 'Trump';
   var cards = [];
 
@@ -62,10 +62,10 @@ function createDeck(gameType){
     suits.forEach(function(suit){
       for (var i=2; i<=14; i++){
         var name = i;
-        if (i === 14)  name = 'A';
-        if (i === 11) name = 'J';
-        if (i === 12) name = 'Q';
-        if (i === 13) name = 'K';
+        if (i === 14)  name = 'ace';
+        if (i === 11) name = 'jack';
+        if (i === 12) name = 'queen';
+        if (i === 13) name = 'king';
         cards.push({
           id: index++,
           suit: suit,

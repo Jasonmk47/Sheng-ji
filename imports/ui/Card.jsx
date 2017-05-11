@@ -28,14 +28,14 @@ export default class Card extends Component {
 			card: "card",
 	    });
 
+	    var name = this.props.card.suit + "";
+	    var namelower = name.toLowerCase();
+	    var cardpic = "/img/" + this.props.card.name + "_of_" + namelower + ".png";
 		return (
 			<div>
-				<div
-					className={cardClassName + this.props.card.id}
-					onClick={this.toggleSelected.bind(this)}>
-					{this.props.card.name} of {this.props.card.suit} id: {this.props.card.id}
-				</div>
-				
+				<img className={cardClassName} 
+					onClick={this.toggleSelected.bind(this)} 
+					src={cardpic}/>
 			</div>
 		);
 	}

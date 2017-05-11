@@ -18,8 +18,15 @@ body {
 }
 
 .selected {
-  background-color: yellow;
+  border: 5px solid #021a40;
+}
 
+.hand {
+}
+
+.card {
+  width: 70px;
+  height: 110px;
 }
  
 .container {

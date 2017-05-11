@@ -71,8 +71,8 @@ Meteor.methods({
     check(cards, Match.Where(function(cards){
       _.each(cards, function (doc) {
         /* do your checks and return false if there is a problem */
-        if(!(doc.suits == 'Clubs' || doc.suits == 'Diamonds' 
-          || doc.suits == 'Hearts' || doc.suits == 'Spades' 
+        if(!(doc.suits == 'clubs' || doc.suits == 'diamonds' 
+          || doc.suits == 'hearts' || doc.suits == 'spades' 
           || doc.suits == 'Trump')) {
           return false;
         }
