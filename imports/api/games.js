@@ -1,4 +1,4 @@
-  //Inspired by https://github.com/FalloutX/meteor-card-game/blob/master/games.js
+//Inspired by https://github.com/FalloutX/meteor-card-game/blob/master/games.js
 
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
@@ -10,7 +10,7 @@ export const Games = new Mongo.Collection("games");
 
 /*
 game = {
-  deck: [], //This will be the bottom cards?
+  deck: [], //This will be the bottom cards once dealt out
   playerIds: [],
   players:{
     a:{
@@ -30,6 +30,8 @@ game = {
       points: [],
     },
   },
+  trumpSuit: String,
+  currentTurn: [],
   inProgress: true/false,
   started: date,
   finished: date
@@ -91,14 +93,29 @@ Meteor.methods({
     console.log(cards);
 
     var game = Games.findOne({_id: gameId});
-    // var hand = game.players[userId].hand;
-
-    // if (game.currentTurn[0] !== id && !Turns.inHand(hand, card)) return;
+    var hand = game.players[userId].hand;
 
     /*TODO: Game logic here*/
 
-    // game.players[id].hand = Turns.removeCard(card, hand);
-    // game.currentTurn.unshift(game.currentTurn.pop());
+    //Throw away cards that are done
+    _.each(cards, function (card) {
+      hand = hand.map(function (card_i) {
+        if (card_i.value === card.value && card_i.suit === card.suit && card_i.id === card.id ) {
+          return;
+        }
+        else {
+          return card_i;
+        }
+      }).filter(function(card_j) {
+        return card_j !== undefined;
+      });
+    });
+
+    console.log(hand);
+
+    //Put point cards into points won for player
+
+    game.currentTurn.unshift(game.currentTurn.pop());
 
     // if( allHandsEmpty(game.players)){
     //   if( game.deck.length > 0){
@@ -107,9 +124,11 @@ Meteor.methods({
     //     scoreGame(game);
     //   }
     // }
-    Games.update(gameId, game);
 
-
+    //Does not properly update db
+    Games.update( gameId, {
+      $set: { hand: hand },
+    });
   },
 
 });
