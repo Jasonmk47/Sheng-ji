@@ -59,6 +59,8 @@ Meteor.methods({
     Games.insert(game);
     console.log("Game has been created.!");
   },
+
+
   'games.submit'(cards, gameId, userId) {
 
     if (cards.length === 0)
@@ -90,12 +92,25 @@ Meteor.methods({
       throw new Meteor.Error('not-authorized');
     }
 
-    console.log(cards);
-
     var game = Games.findOne({_id: gameId});
     var hand = game.players[userId].hand;
 
     /*TODO: Game logic here*/
+
+    // error checking and all that jazz
+
+    // if we are the starting player
+    console.log(game.currentHand);
+    if (Meteor.userId() == game.currentHand.startingPlayer) {
+       game.currentHand.suit = cards[0].suit;
+       game.currentHand.pattern = 'single';     // this is v broken
+    }
+
+    // put cards into currentHand
+    game.currentHand.shownCards[Meteor.userId()] = cards;
+
+    console.log(game.currentHand);
+
 
     //Throw away cards that are done
     _.each(cards, function (card) {
@@ -111,11 +126,11 @@ Meteor.methods({
       });
     });
 
-    console.log(game.players[userId].hand);
+    // console.log(game.players[userId].hand);
 
-    //Put point cards into points won for player
+    // Put point cards into points won for player
 
-    game.currentTurn.unshift(game.currentTurn.pop());
+    // game.currentTurn.peek();
 
     // if( allHandsEmpty(game.players)){
     //   if( game.deck.length > 0){

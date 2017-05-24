@@ -7,6 +7,8 @@ import { Games } from '../api/games.js';
 
 import Hand from './Hand.jsx';
 import FriendList from './FriendList.jsx';
+import GameList from './GameList.jsx';
+
 import AccountsUIWrapper from './AccountsUIWrapper.jsx';
 
 // App component - represents the whole app
@@ -21,9 +23,11 @@ class App extends Component {
             play: [], //Current cards in play
             currentGameId: -1, //No current game
             selectedUsers: [], //For making games
+            selectedGame: null,
         };
         this.toggleToPlay = this.toggleToPlay.bind(this);
         this.toggleToSelect = this.toggleToSelect.bind(this);
+        this.toggleToSelectGame = this.toggleToSelectGame.bind(this);
     }
 
     toggleToPlay(card) {
@@ -74,22 +78,18 @@ class App extends Component {
         return true;
     }
 
+    toggleToSelectGame(game) {
+        this.setState(previousState => ({
+            selectedGame: game,
+        }));
+        return true;
+    }
+
     renderHand(){
         if(this.state.inGame) {
             return <Hand gameId={this.state.currentGameId} games={this.props.games} 
                     currentUser={this.props.currentUser} toggleToPlay={this.toggleToPlay}/>
         }
-    }
-
-    //Change to be identifiable. Maybe give each game a changeable name
-    renderGames(){
-        return this.props.games.map(game => { return (
-            <li key={game._id}>
-                <label>{game._id}
-                <input type="checkbox"/>
-                </label>
-            </li>
-        )});
     }
 
     submitHand(event){
@@ -127,10 +127,13 @@ class App extends Component {
     startGame(event){
         event.preventDefault();
 
-        //hardcoded to test
-        console.log(this.props.games[0]._id);
+        const search = this.props.games.findIndex((game) => {
+            return (game._id == this.state.selectedGame) 
+        });
 
-        this.setState({currentGameId: this.props.games[0]._id});
+        const game = this.props.games[search];
+
+        this.setState({currentGameId: game._id});
         this.setState({inGame: true});
     }
 
@@ -154,7 +157,7 @@ class App extends Component {
                         <FriendList friends={this.props.friends} toggleToSelect={this.toggleToSelect} />
                     </ul>
                     <ul className="games-list">
-                        {this.renderGames()}
+                        <GameList games={this.props.games} toggleToSelect={this.toggleToSelectGame} />
                     </ul>
                 </div>
                 }

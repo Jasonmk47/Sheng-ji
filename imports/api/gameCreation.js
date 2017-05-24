@@ -11,15 +11,26 @@ GameFactory.createGame = function(playerIds, gameType){
 
   GameFactory.dealPlayers(players, deck);
 
+  console.log("new code");
+
   return {
     //Maybe add a field for unique game id? As of now this is unique because of db id
-    deck: deck,
-    plays: [], //To record past plays
-    playerIds,
+    deck: deck,   // bottom  
+    plays: [],    // To record past plays
+    playerIds: playerIds,
+    startingPlayer: playerIds[0],
     players: players,
     gameType: gameType,
+    trumpNump: 2,
     trumpSuit: "Trump",
-    currentTurn: [], //Needs to be set depending on who gets the first 2
+    currentHand: {
+      shownCards: [],   // dict of playerID + cards played
+      startingPlayer: playerIds[0],
+      pattern: null, 
+      suit: null
+    },
+    previousHands: [],
+    // metadata
     inProgress: true,
     started: new Date(),
     finished: -1
