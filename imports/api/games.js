@@ -100,17 +100,17 @@ Meteor.methods({
     // error checking and all that jazz
 
     // if we are the starting player
-    console.log(game.currentHand);
     if (Meteor.userId() == game.currentHand.startingPlayer) {
        game.currentHand.suit = cards[0].suit;
        game.currentHand.pattern = 'single';     // this is v broken
     }
 
     // put cards into currentHand
-    game.currentHand.shownCards[Meteor.userId()] = cards;
-
-    console.log(game.currentHand);
-
+    // var currentHand = game.currentHand;
+    game.currentHand.shownCards.push({
+      "userId": userId,
+      "cards": cards,
+    });
 
     //Throw away cards that are done
     _.each(cards, function (card) {
@@ -126,7 +126,7 @@ Meteor.methods({
       });
     });
 
-    // console.log(game.players[userId].hand);
+    console.log(game);
 
     // Put point cards into points won for player
 

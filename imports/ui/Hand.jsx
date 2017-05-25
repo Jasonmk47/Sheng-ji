@@ -13,8 +13,8 @@ export default class Hand extends Component {
     renderCards(){
         const game = this.props.games.find( game => {if(game._id == this.props.gameId) return game;} );
 
-        console.log(game);
-        console.log(this.props.currentUser);
+        // console.log(game);
+        // console.log(this.props.currentUser);
 
         return game.players[this.props.currentUser._id].hand.map((card) => (
            <Card key={card.id} card={card} toggleToPlay={this.props.toggleToPlay}/>

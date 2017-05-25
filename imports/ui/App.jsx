@@ -6,6 +6,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import { Games } from '../api/games.js';
 
 import Hand from './Hand.jsx';
+import Table from './Table.jsx';
 import FriendList from './FriendList.jsx';
 import GameList from './GameList.jsx';
 
@@ -92,6 +93,13 @@ class App extends Component {
         }
     }
 
+    renderTable(){
+        if(this.state.inGame) {
+            return <Table gameId={this.state.currentGameId} games={this.props.games} 
+                    currentUser={this.props.currentUser}/>
+        }
+    }
+
     submitHand(event){
         event.preventDefault();
 
@@ -117,9 +125,9 @@ class App extends Component {
         const second = this.state.selectedUsers[1];
         const third = this.state.selectedUsers[2];
 
-        console.log(first);
-        console.log(second);
-        console.log(third);
+        // console.log(first);
+        // console.log(second);
+        // console.log(third);
 
         Meteor.call('games.createGame', first, second, third);
     }
@@ -150,6 +158,8 @@ class App extends Component {
                 {this.state.inGame ? 
                 <div>
                     {this.renderHand()}
+
+                    {this.renderTable()}
                 </div>
                 :
                 <div className="start-game">

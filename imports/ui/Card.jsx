@@ -43,5 +43,5 @@ export default class Card extends Component {
 
 Card.propTypes = {
 	card: PropTypes.object.isRequired,
-	toggleToPlay: PropTypes.func.isRequired,
+	toggleToPlay: PropTypes.func,
 };
