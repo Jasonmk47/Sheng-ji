@@ -60,6 +60,10 @@ Meteor.methods({
     console.log("Game has been created.!");
   },
 
+  'games.delete'(gameId) {
+      Games.remove({_id: gameId});
+  },
+
 
   'games.submit'(cards, gameId, userId) {
 
@@ -100,19 +104,26 @@ Meteor.methods({
     // error checking and all that jazz
 
     // if we are the starting player
-    if (Meteor.userId() == game.currentHand.startingPlayer) {
+    if (game.currentHand.shownCards.length == 0) {
        game.currentHand.suit = cards[0].suit;
        game.currentHand.pattern = 'single';     // this is v broken
     }
 
     // put cards into currentHand
-    // var currentHand = game.currentHand;
     game.currentHand.shownCards.push({
       "userId": userId,
       "cards": cards,
     });
 
     //Throw away cards that are done
+    // var myCards = game.players[userId].hand;
+    // myCards = myCards.filter( (card) => {
+    //   cards.map((pos))
+    //   return !cards.includes(card);
+    // });
+    // game.players[userId].hand = myCards;
+    // console.log(myCards);
+
     _.each(cards, function (card) {
       game.players[userId].hand = game.players[userId].hand.map(function (card_i) {
         if (card_i.value === card.value && card_i.suit === card.suit && card_i.id === card.id ) {

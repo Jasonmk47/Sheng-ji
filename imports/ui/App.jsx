@@ -111,6 +111,17 @@ class App extends Component {
         Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser._id);
     }
 
+    deleteGame(event) {
+        event.preventDefault();
+        const search = this.props.games.findIndex((game) => {
+            return (game._id == this.state.selectedGame) 
+        });
+
+        const game = this.props.games[search];
+        console.log(game);
+        Meteor.call('games.delete', game._id);
+    }
+
     createGame(event){
         event.preventDefault();
 
@@ -195,6 +206,14 @@ class App extends Component {
                                 type='submit'
                                 value="Start Game"
                                 name="start-game"
+                            />
+                        </form>
+
+                        <form className="delete-game" onSubmit={this.deleteGame.bind(this)}>
+                            <input
+                                type='submit'
+                                value="Delete Game"
+                                name="delete-game"
                             />
                         </form>
                     </div>
