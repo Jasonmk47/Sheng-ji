@@ -28,7 +28,7 @@ export default class Table extends Component {
 
 	render() {
 	    const tableClassName = classnames({
-	    	table: "table",
+	    	table,
 	    });
 
 		return (

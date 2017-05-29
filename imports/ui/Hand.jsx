@@ -40,7 +40,7 @@ export default class Hand extends Component {
 
 	render() {
 	    const handClassName = classnames({
-	    	hand: "hand",
+	    	hand,
 	    });
 
 		return (
