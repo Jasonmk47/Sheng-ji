@@ -103,21 +103,31 @@ class App extends Component {
     submitHand(event){
         event.preventDefault();
 
-        console.log(this.state.play);
         if (this.state.play.length === 0) {
             console.log("No cards in play")
             return false;
         }
-        Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser._id);
+
+        const gameIndex = this.props.games.findIndex((game) => {
+            return (game._id == this.state.selectedGame) 
+        });
+
+        const game = this.props.games[gameIndex];
+
+        if (this.props.currentUser._id == game.currentHand.currentPlayer) {
+            Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser._id);
+        } else {
+            console.log('Not your turn!');
+        }
     }
 
     deleteGame(event) {
         event.preventDefault();
-        const search = this.props.games.findIndex((game) => {
+        const gameIndex = this.props.games.findIndex((game) => {
             return (game._id == this.state.selectedGame) 
         });
 
-        const game = this.props.games[search];
+        const game = this.props.games[gameIndex];
         console.log(game);
         Meteor.call('games.delete', game._id);
     }

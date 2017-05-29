@@ -25,7 +25,7 @@ GameFactory.createGame = function(playerIds, gameType){
     trumpSuit: "Trump",
     currentHand: {
       shownCards: [],   // dict of playerID + cards played
-      startingPlayer: playerIds[0],
+      currentPlayer: playerIds[0],
       pattern: null, 
       suit: null
     },

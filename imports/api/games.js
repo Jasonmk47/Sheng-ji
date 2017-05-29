@@ -137,12 +137,21 @@ Meteor.methods({
       });
     });
 
-    console.log(game);
+    // move onto next player
+    const playerIndex = game.playerIds.findIndex((id) => {
+        return (userId == id);
+    });
+    
+    game.currentHand.currentPlayer = game.playerIds[(playerIndex + 1) % game.playerIds.length];
 
-    // Put point cards into points won for player
-
-    // game.currentTurn.peek();
-
+    // all players have played
+    if (game.currentHand.shownCards.length == game.playerId.length) {
+      // check to see who won
+      // Put point cards into points won for player
+      // currentHand into previousHands, create new currentHand
+    }
+    
+    // check to see end of game
     // if( allHandsEmpty(game.players)){
     //   if( game.deck.length > 0){
     //     GameFactory.dealPlayers(game.players, game.deck);
@@ -152,6 +161,7 @@ Meteor.methods({
     // }
 
     //Does not properly update db
+    console.log(game);
     Games.update( gameId, game );
   },
 
