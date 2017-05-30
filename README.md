@@ -53,7 +53,7 @@ TODOS:
 				 Winning
 
 
-If you schwai (whatever I dont know how to write this), and you get rekt by someone else, do we show:
+If you shuai (whatever I dont know how to write this), and you get rekt by someone else, do we show:
 	Everyone who can beat you
 	Show your hand but then auto turn it into a valid hand
 	Automatically just make your hand valid
