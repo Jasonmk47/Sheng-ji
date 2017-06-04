@@ -108,6 +108,11 @@ class App extends Component {
             return false;
         }
 
+        if (!Meteor.call('games.checkCards', this.state.play, this.state.currentGameId, this.props.currentUser._id)) {
+            console.log("Illegal play!")
+            return false; 
+        }
+
         const gameIndex = this.props.games.findIndex((game) => {
             return (game._id == this.state.selectedGame) 
         });

@@ -141,7 +141,7 @@ Meteor.methods({
         
         doubles.forEach((v, i) => {      // check for no cons-doubles in suit
           if (i > 0 && (doubles[i-1] + 1 == v)) {
-            return false; 
+            return false;
           }
         });
       }
