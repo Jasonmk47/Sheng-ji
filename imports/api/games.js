@@ -99,9 +99,8 @@ Meteor.methods({
       return false; // err
     }
 
-    // check suit of each card
+    // check suit of each card and if player is out of suit
     if (!cards.every((card) => { card.suit == game.currentHand.suit })) {
-      // check to see if player is out of suit
       let myCards = game.players[playerId].hand;                          // get current hand 
       let tempCards = myCards.filter((c) => {return !cards.includes(c)}); // get hand without played cards
       if (!tempCards.every((c) => {c.suit != game.currentHand.suit})) {   // check to see none of suit left
@@ -111,10 +110,26 @@ Meteor.methods({
 
     // "single" errors are caught by above tests
 
+    // check for doubles of a given suit in hand
+    let seen = []
+    let doubles = []
+
+    for (let c of game.players[userId].hand) {  // for each card in hand
+      if (c.suit == game.currentHand.suit) {    // filter by suit
+        if (seen.includes(c.value)) {           // if seen before
+          doubles.push(c.value);                // add to doubles
+        }
+        seen.push(c.value);                     // add to seen list
+      }
+    }
+    double.sort((a, b) => { return a - b });
+
     // check for errors in "double"
     if (game.currentHand.pattern == "double") {
-      if (cards[0].value != cards[1].value) {
-        // check for no doubles in suit
+      if (cards[0].value != cards[1].value) {       // if didn't play double
+        if (doubles.length > 0) {  // make sure no doubles in hand
+          return false;
+        }  
       }
     }
 
@@ -123,7 +138,12 @@ Meteor.methods({
       if (cards[0].value != cards[1].value || 
           cards[2].value != cards[3].value || 
           cards[2].value != (cards[1].value+1)) {
-        // check for no cons-doubles in suit
+        
+        doubles.forEach((v, i) => {      // check for no cons-doubles in suit
+          if (i > 0 && (doubles[i-1] + 1 == v)) {
+            return false; 
+          }
+        });
       }
     }
   },
@@ -143,6 +163,9 @@ Meteor.methods({
     // if we are the starting player
     if (game.currentHand.shownCards.length == 0) {
       game.currentHand.suit = cards[0].suit;
+      if (!cards.every((card) => { card.suit == game.currentHand.suit })) {
+        return false; // err
+      }
 
       // figure out pattern (shuai not included for now)
       switch (cards.length) {
