@@ -5,8 +5,8 @@ import { Mongo } from 'meteor/mongo';
 import { check } from 'meteor/check';
 
 import './gameCreation.js';
- 
-export const Games = new Mongo.Collection("games");
+
+export const Games = new Mongo.Collection('games');
 
 /*
 game = {
@@ -37,17 +37,6 @@ game = {
   finished: date
 }
 */
-
-if (Meteor.isServer){
-  //TODO: Figure out how to publish only info for current user
-  Meteor.publish("games", function(){
-    return Games.find();
-  });
-
-  Meteor.publish("users", function(){ //Change this to a friends list at some point
-    return Meteor.users.find();
-  });
-}
 
 Meteor.methods({
   'games.createGame'(player2, player3, player4) {

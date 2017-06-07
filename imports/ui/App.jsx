@@ -241,7 +241,7 @@ App.propTypes = {
 
 export default createContainer(() => {
     Meteor.subscribe("games");
-    Meteor.subscribe("users"); //Is this what limits Meteor.users?
+    Meteor.subscribe("users");
 
     return {
         games: Games.find({}, { sort: { createdAt: -1 } }).fetch(),
