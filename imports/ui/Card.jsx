@@ -25,7 +25,7 @@ export default class Card extends Component {
 	    var cid = this.props.card.id;
 	    const cardClassName = classnames({
 			selected: this.state.selected,
-			card,
+			card: 1,
 	    });
 
 	    var name = this.props.card.suit + "";

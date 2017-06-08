@@ -24,7 +24,7 @@ class App extends Component {
             play: [], //Current cards in play
             currentGameId: -1, //No current game
             selectedUsers: [], //For making games
-            selectedGame: null,
+            selectedGames: [],
         };
         this.toggleToPlay = this.toggleToPlay.bind(this);
         this.toggleToSelect = this.toggleToSelect.bind(this);
@@ -80,9 +80,24 @@ class App extends Component {
     }
 
     toggleToSelectGame(game) {
-        this.setState(previousState => ({
-            selectedGame: game,
-        }));
+        var index = this.state.selectedGames.indexOf(game)
+
+        if (index > -1)
+        {
+            //http://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
+            this.setState(previousState => ({
+                selectedGames: previousState.selectedGames.filter((_, i) => i !== index)
+            }));
+        }
+        else {
+            //http://stackoverflow.com/questions/26505064/react-js-what-is-the-best-way-to-add-a-value-to-an-array-in-state
+            this.setState(previousState => ({
+                selectedGames: previousState.selectedGames.concat(game)
+            }));
+        }
+
+
+        console.log(this.state.selectedGames);
         return true;
     }
 
@@ -108,6 +123,11 @@ class App extends Component {
             return false;
         }
 
+        if (!Meteor.call('games.checkCards', this.state.play, this.state.currentGameId, this.props.currentUser._id)) {
+            console.log("Illegal play!")
+            return false; 
+        }
+
         const gameIndex = this.props.games.findIndex((game) => {
             return (game._id == this.state.selectedGame) 
         });
@@ -123,13 +143,21 @@ class App extends Component {
 
     deleteGame(event) {
         event.preventDefault();
-        const gameIndex = this.props.games.findIndex((game) => {
-            return (game._id == this.state.selectedGame) 
-        });
 
-        const game = this.props.games[gameIndex];
-        console.log(game);
-        Meteor.call('games.delete', game._id);
+        const numGamesSelected = this.state.selectedGames.length;
+
+        for (let i = 0; i < numGamesSelected; i++) {
+            const gameIndex = this.props.games.findIndex((game) => {
+                return (game._id == this.state.selectedGames[i]); 
+            });
+
+            const game = this.props.games[gameIndex];
+            Meteor.call('games.delete', game._id);
+        }
+
+        this.setState(previousState => ({
+            selectedGames: []
+        }));
     }
 
     createGame(event){
@@ -146,18 +174,22 @@ class App extends Component {
         const second = this.state.selectedUsers[1];
         const third = this.state.selectedUsers[2];
 
-        // console.log(first);
-        // console.log(second);
-        // console.log(third);
-
         Meteor.call('games.createGame', first, second, third);
     }
 
     startGame(event){
         event.preventDefault();
 
+        console.log(this.state.selectedGames[0]);
+        console.log(this.state.selectedGames.length);
+
+        if (this.state.selectedGames.length > 1) {
+            console.log("Too many games selected");
+            return false;
+        }
+
         const search = this.props.games.findIndex((game) => {
-            return (game._id == this.state.selectedGame) 
+            return (game._id == this.state.selectedGames[0]) 
         });
 
         const game = this.props.games[search];

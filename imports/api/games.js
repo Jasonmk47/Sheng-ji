@@ -53,32 +53,91 @@ Meteor.methods({
       Games.remove({_id: gameId});
   },
 
+  'games.checkCards'(cards, gameId, userId) {
+    
+    // Make sure the user is logged in
+    if (! Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
 
-  'games.submit'(cards, gameId, userId) {
+    var game = Games.findOne({_id: gameId});
+    var hand = game.players[userId].hand;
 
+    // some cards are submitted
     if (cards.length === 0)
     {
       console.log("no cards in this hand- Should be caught before here");
       return false;
     }
 
-    //https://forums.meteor.com/t/check-object-in-an-array/3355
-    check(cards, Match.Where(function(cards){
-      _.each(cards, function (doc) {
-        /* do your checks and return false if there is a problem */
-        if(!(doc.suits == 'clubs' || doc.suits == 'diamonds' 
-          || doc.suits == 'hearts' || doc.suits == 'spades' 
-          || doc.suits == 'Trump')) {
-          return false;
+    // make sure each card has valid suit and value
+    var validCards = cards.every((card) => {
+    
+      let validSuit = ['clubs', 'diamonds', 'hearts', 'spades', 'Trump'].includes(card.suits);
+      let validValue = !(card.value < 1 || card.value > 14);
+
+      return validSuit && validValue; 
+    }); 
+
+    if (!validCards) {
+      return false; 
+    }
+
+    // check length of submitted cards, and pattern
+    if (cards.length != game.currentHand.shownCards[0].cards.length) {
+      return false; // err
+    }
+
+    // check suit of each card and if player is out of suit
+    if (!cards.every((card) => { card.suit == game.currentHand.suit })) {
+      let myCards = game.players[playerId].hand;                          // get current hand 
+      let tempCards = myCards.filter((c) => {return !cards.includes(c)}); // get hand without played cards
+      if (!tempCards.every((c) => {c.suit != game.currentHand.suit})) {   // check to see none of suit left
+        return false;
+      }
+    }
+
+    // "single" errors are caught by above tests
+
+    // check for doubles of a given suit in hand
+    let seen = []
+    let doubles = []
+
+    for (let c of game.players[userId].hand) {  // for each card in hand
+      if (c.suit == game.currentHand.suit) {    // filter by suit
+        if (seen.includes(c.value)) {           // if seen before
+          doubles.push(c.value);                // add to doubles
         }
-        if (doc.value < 1 || doc.value > 14){
+        seen.push(c.value);                     // add to seen list
+      }
+    }
+    double.sort((a, b) => { return a - b });
+
+    // check for errors in "double"
+    if (game.currentHand.pattern == "double") {
+      if (cards[0].value != cards[1].value) {       // if didn't play double
+        if (doubles.length > 0) {  // make sure no doubles in hand
           return false;
-        }
-        //TODO:check the name
-      });
-      // return true if there is no problem
-      return true;
-    }));
+        }  
+      }
+    }
+
+    // check for errors in "consecutive_double"
+    if (game.currentHand.pattern = "consecutive_double") {
+      if (cards[0].value != cards[1].value || 
+          cards[2].value != cards[3].value || 
+          cards[2].value != (cards[1].value+1)) {
+        
+        doubles.forEach((v, i) => {      // check for no cons-doubles in suit
+          if (i > 0 && (doubles[i-1] + 1 == v)) {
+            return false;
+          }
+        });
+      }
+    }
+  },
+
+  'games.submit'(cards, gameId, userId) {
 
     // Make sure the user is logged in
     if (! Meteor.userId()) {
@@ -90,14 +149,43 @@ Meteor.methods({
 
     /*TODO: Game logic here*/
 
-    // error checking and all that jazz
-
     // if we are the starting player
     if (game.currentHand.shownCards.length == 0) {
-       game.currentHand.suit = cards[0].suit;
-       game.currentHand.pattern = 'single';     // this is v broken
-    }
+      game.currentHand.suit = cards[0].suit;
+      if (!cards.every((card) => { card.suit == game.currentHand.suit })) {
+        return false; // err
+      }
 
+      // figure out pattern (shuai not included for now)
+      switch (cards.length) {
+        case 1:
+          game.currentHand.pattern = 'single';     
+          break;
+        case 2: 
+          if (cards[0].value == cards[1].value) {
+            game.currentHand.pattern = "double"; 
+          } else {
+            // error or shuai
+          }
+          break;
+        case 4:
+          if (cards[0].value == cards[1].value && 
+              cards[2].value == cards[3].value && 
+              cards[2].value == (cards[1].value+1)) {
+            game.currentHand.pattern = "consecutive_double";
+          } else {
+            // error or shuai
+          }
+          break;
+        default: 
+          // error
+          break;
+      }
+    }
+    
+    // error checking and all that jazz
+    Meteor.call("games.checkCards", cards, gameId, userId);
+    
     // put cards into currentHand
     game.currentHand.shownCards.push({
       "userId": userId,
@@ -132,6 +220,7 @@ Meteor.methods({
     });
     
     game.currentHand.currentPlayer = game.playerIds[(playerIndex + 1) % game.playerIds.length];
+
 
     // all players have played
     if (game.currentHand.shownCards.length == game.playerId.length) {

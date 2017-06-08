@@ -13,7 +13,7 @@ export default class GameList extends Component {
 
 	// Switch the selected property
 	toggleSelected(id) {
-		console.log(id)
+		console.log("toggling" + id)
 		if (this.props.toggleToSelect(id)) {
 			this.setState(previousState => ({
             	selected: id
@@ -26,9 +26,9 @@ export default class GameList extends Component {
     //Change to be identifiable. Maybe give each game a changeable name
     renderGames(){
         return this.props.games.map(game => { return (
-            <li key={game._id} onClick={() => this.toggleSelected(game._id)}>
+            <li key={game._id} >
                 <label>{game._id}
-                <input type="checkbox"/>
+                <input onClick={() => this.toggleSelected(game._id)} type="checkbox"/>
                 </label>
             </li>
         )});

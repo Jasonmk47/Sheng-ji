@@ -18,7 +18,7 @@ export default class Table extends Component {
 
         return game.currentHand.shownCards.map((play) => (
             <div> 
-                { play.userId} 
+                { play.userId } 
 
                 { play.cards.map((card) => (
                     <Card key={card.id} card={card}/>
@@ -27,9 +27,7 @@ export default class Table extends Component {
     }
 
 	render() {
-	    const tableClassName = classnames({
-	    	table,
-	    });
+	    const tableClassName = classnames('table');
 
 		return (
 			<div className={tableClassName}>
@@ -41,6 +39,6 @@ export default class Table extends Component {
 
 Table.propTypes = {
 	games: PropTypes.array.isRequired,
-	gameId: PropTypes.object.isRequired,
+	gameId: PropTypes.string.isRequired,
 	currentUser: PropTypes.object.isRequired,
 };

@@ -39,9 +39,7 @@ export default class Hand extends Component {
     }
 
 	render() {
-	    const handClassName = classnames({
-	    	hand,
-	    });
+	    const handClassName = classnames('hand');
 
 		return (
 			<div className={handClassName}>
@@ -53,7 +51,7 @@ export default class Hand extends Component {
 
 Hand.propTypes = {
 	games: PropTypes.array.isRequired,
-	gameId: PropTypes.object.isRequired,
+	gameId: PropTypes.string.isRequired,
 	currentUser: PropTypes.object.isRequired,
 	toggleToPlay: PropTypes.func.isRequired,
 };
