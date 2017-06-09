@@ -17,16 +17,21 @@ body {
   font-size: 14px;
 }
 
-.selected {
-  border: 5px solid #021a40;
-}
-
 .hand {
+  height: 180px;
+  margin-left: 50px;
 }
 
 .card {
   width: 70px;
   height: 110px;
+  float: left;
+  margin-left: -50px;
+  margin-top: 30px;
+}
+
+.selected {
+  margin-top: 0px;
 }
  
 .container {
