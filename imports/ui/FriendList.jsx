@@ -36,7 +36,7 @@ export default class FriendList extends Component {
 	   
 		    // Give className to cards to highlight if selected
 		    const friendClassName = classnames({
-				selected: _.contains(this.state.selected, friend._id),
+				selectedfriend: _.contains(this.state.selected, friend._id),
 				friend,
 		    });
 

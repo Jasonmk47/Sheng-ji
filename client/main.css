@@ -33,6 +33,10 @@ body {
 .selected {
   margin-top: 0px;
 }
+
+.selectedfriend {   
+  border: 5px solid #021a40;    
+}
  
 .container {
   max-width: 600px;
