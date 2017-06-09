@@ -22,6 +22,12 @@ Meteor.publish("games", function(){
 		// }
 	);
 
+	//manipulate data here
+	//Make sure this doesn't affect persistent db information
+//    data.update();
+
+
+
 	if (data) return data;
 
 	return this.ready();
@@ -29,5 +35,8 @@ Meteor.publish("games", function(){
 });
 
 Meteor.publish("users", function(){ //Change this to a friends list at some point
-	return Meteor.users.find();
+	var currentUserId = this.userId;
+
+	if (currentUserId)
+		return Meteor.users.find();
 });

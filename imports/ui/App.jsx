@@ -31,6 +31,12 @@ class App extends Component {
         this.toggleToSelectGame = this.toggleToSelectGame.bind(this);
     }
 
+    componentWillUpdate(nextProps, nextState) {
+        if (!Meteor.user()) {
+            nextState.inGame = false;
+        }
+    }
+
     toggleToPlay(card) {
         //TODO: If not logical card reject here and return false
         var index = this.state.play.indexOf(card)
@@ -155,9 +161,7 @@ class App extends Component {
             Meteor.call('games.delete', game._id);
         }
 
-        this.setState(previousState => ({
-            selectedGames: []
-        }));
+        this.setState({ selectedGames: [] });
     }
 
     createGame(event){
