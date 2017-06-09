@@ -34,6 +34,8 @@ class App extends Component {
     componentWillUpdate(nextProps, nextState) {
         if (!Meteor.user()) {
             nextState.inGame = false;
+            nextState.selectedGames = [];
+            nextState.selectedUsers = [];
         }
     }
 
