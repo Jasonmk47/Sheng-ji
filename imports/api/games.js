@@ -299,9 +299,7 @@ Meteor.methods({
       let matchPattern = null; 
       switch (game.currentHand.pattern) {
         case 'single':
-          matchPattern = (playedCards) => {
-            return true;
-          }
+          matchPattern = (playedCards) => { return true; }
           break;
 
         case 'double':
@@ -313,8 +311,14 @@ Meteor.methods({
 
         case 'consecutive_double': 
           matchPattern = (playedCards) => {
-            return (playedCards[0].suit == playedCards[1].suit) &&
-                   (playedCards[0].value == playedCards[1].value);
+            
+            if (!playedCards.forEach((card) => { return card.suit == playedCards[0].suit })) {
+              return false;
+            }
+
+            return (playedCards[0].value == playedCards[1].value) &&
+                   (playedCards[2].value == playedCards[3].value) && 
+                   (playedCards[1].value == playedCards[2].value - 1);
           }
           break; 
       }
