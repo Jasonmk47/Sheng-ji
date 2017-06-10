@@ -17,9 +17,15 @@ body {
   font-size: 14px;
 }
 
+.table {
+  height: 180px;
+  margin-left: 75px;
+}
+
 .hand {
   height: 180px;
-  margin-left: 50px;
+  margin-left: 75px;
+  clear: both;
 }
 
 .card {

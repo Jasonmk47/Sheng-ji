@@ -54,46 +54,62 @@ Meteor.methods({
   },
 
   'games.checkCards'(cards, gameId, userId) {
-    
+  
     // Make sure the user is logged in
     if (! Meteor.userId()) {
       throw new Meteor.Error('not-authorized');
     }
 
     var game = Games.findOne({_id: gameId});
+
+    if (game == null) {
+      throw new Meteor.Error('Game not found');
+    }
+
     var hand = game.players[userId].hand;
 
     // some cards are submitted
     if (cards.length === 0)
     {
-      console.log("no cards in this hand- Should be caught before here");
-      return false;
+      throw new Meteor.Error('No cards in hand');
     }
 
     // make sure each card has valid suit and value
     var validCards = cards.every((card) => {
     
-      let validSuit = ['clubs', 'diamonds', 'hearts', 'spades', 'Trump'].includes(card.suits);
+      let validSuit = ['clubs', 'diamonds', 'hearts', 'spades', 'Trump'].includes(card.suit);
       let validValue = !(card.value < 1 || card.value > 14);
 
       return validSuit && validValue; 
     }); 
 
     if (!validCards) {
-      return false; 
+      throw new Meteor.Error('Invalid cards');
+    }
+
+    if (game.currentHand.shownCards.length == 0) {
+      console.log("Starting player: special card checks");
+      // check to see player leads with cards of all same suit
+      if (!cards.every((card) => { return card.suit == cards[0].suit })) {
+        throw new Meteor.Error('Cards of different suits');
+      }
+
+      // check for shuai 
+
+      return; 
     }
 
     // check length of submitted cards, and pattern
     if (cards.length != game.currentHand.shownCards[0].cards.length) {
-      return false; // err
+      throw new Meteor.Error('Does not match starting pattern');
     }
 
     // check suit of each card and if player is out of suit
-    if (!cards.every((card) => { card.suit == game.currentHand.suit })) {
+    if (!cards.every((card) => { return card.suit == game.currentHand.suit })) {
       let myCards = game.players[playerId].hand;                          // get current hand 
       let tempCards = myCards.filter((c) => {return !cards.includes(c)}); // get hand without played cards
       if (!tempCards.every((c) => {c.suit != game.currentHand.suit})) {   // check to see none of suit left
-        return false;
+        throw new Meteor.Error('Does not match starting suit');
       }
     }
 
@@ -116,8 +132,8 @@ Meteor.methods({
     // check for errors in "double"
     if (game.currentHand.pattern == "double") {
       if (cards[0].value != cards[1].value) {       // if didn't play double
-        if (doubles.length > 0) {  // make sure no doubles in hand
-          return false;
+        if (doubles.length > 0) {                   // make sure no doubles in hand
+          throw new Meteor.Error('Must play double in suit');;
         }  
       }
     }
@@ -130,7 +146,7 @@ Meteor.methods({
         
         doubles.forEach((v, i) => {      // check for no cons-doubles in suit
           if (i > 0 && (doubles[i-1] + 1 == v)) {
-            return false;
+            throw new Meteor.Error('Must play consecutive double in suit');
           }
         });
       }
@@ -149,12 +165,12 @@ Meteor.methods({
 
     /*TODO: Game logic here*/
 
+    // error checking and all that jazz
+    Meteor.call("games.checkCards", cards, gameId, userId);
+
     // if we are the starting player
     if (game.currentHand.shownCards.length == 0) {
       game.currentHand.suit = cards[0].suit;
-      if (!cards.every((card) => { card.suit == game.currentHand.suit })) {
-        return false; // err
-      }
 
       // figure out pattern (shuai not included for now)
       switch (cards.length) {
@@ -182,9 +198,6 @@ Meteor.methods({
           break;
       }
     }
-    
-    // error checking and all that jazz
-    Meteor.call("games.checkCards", cards, gameId, userId);
     
     // put cards into currentHand
     game.currentHand.shownCards.push({
@@ -223,7 +236,7 @@ Meteor.methods({
 
 
     // all players have played
-    if (game.currentHand.shownCards.length == game.playerId.length) {
+    if (game.currentHand.shownCards.length == game.playerIds.length) {
       // check to see who won
       // Put point cards into points won for player
       // currentHand into previousHands, create new currentHand

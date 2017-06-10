@@ -13,7 +13,7 @@ export default class GameList extends Component {
 
 	// Switch the selected property
 	toggleSelected(id) {
-		console.log("toggling" + id)
+		console.log("toggling: " + id)
 		if (this.props.toggleToSelect(id)) {
 			this.setState(previousState => ({
             	selected: id

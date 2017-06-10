@@ -104,8 +104,6 @@ class App extends Component {
             }));
         }
 
-
-        console.log(this.state.selectedGames);
         return true;
     }
 
@@ -126,27 +124,34 @@ class App extends Component {
     submitHand(event){
         event.preventDefault();
 
+        const gameIndex = this.props.games.findIndex((game) => {
+            return (game._id == this.state.currentGameId) 
+        });
+        
+        const game = this.props.games[gameIndex];
+        console.log("App.jsx testing game selection");
+        console.log(this.props.currentUser._id);
+        console.log(game);
+
         if (this.state.play.length === 0) {
             console.log("No cards in play")
             return false;
         }
 
-        if (!Meteor.call('games.checkCards', this.state.play, this.state.currentGameId, this.props.currentUser._id)) {
-            console.log("Illegal play!")
-            return false; 
+        if (this.props.currentUser._id != game.currentHand.currentPlayer) {
+            console.log('Not your turn!');
+            return false;
         }
 
-        const gameIndex = this.props.games.findIndex((game) => {
-            return (game._id == this.state.selectedGame) 
+        Meteor.call('games.checkCards', this.state.play, this.state.currentGameId, 
+            this.props.currentUser._id, (error) => { 
+                if (error) {
+                    console.log("Illegal play!")
+                    return false;
+                } 
         });
 
-        const game = this.props.games[gameIndex];
-
-        if (this.props.currentUser._id == game.currentHand.currentPlayer) {
-            Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser._id);
-        } else {
-            console.log('Not your turn!');
-        }
+        Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser._id);
     }
 
     deleteGame(event) {
@@ -187,7 +192,6 @@ class App extends Component {
         event.preventDefault();
 
         console.log(this.state.selectedGames[0]);
-        console.log(this.state.selectedGames.length);
 
         if (this.state.selectedGames.length > 1) {
             console.log("Too many games selected");
@@ -216,9 +220,8 @@ class App extends Component {
 
                 {this.state.inGame ? 
                 <div>
-                    {this.renderHand()}
-
                     {this.renderTable()}
+                    {this.renderHand()}
                 </div>
                 :
                 <div className="start-game">
