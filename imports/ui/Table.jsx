@@ -13,9 +13,6 @@ export default class Table extends Component {
     renderCards(){
         const game = this.props.games.find( game => {if(game._id == this.props.gameId) return game;} );
 
-        console.log("table")
-        console.log(game.currentHand);
-
         return game.currentHand.shownCards.map((play) => (
             <div> 
                 { play.userId } 
@@ -30,7 +27,7 @@ export default class Table extends Component {
 	    const tableClassName = classnames('table');
 
 		return (
-			<div className={tableClassName}>
+			<div className={tableClassName} style={{width:'100%'}}>
 				{this.renderCards()}
             </div>
 		);
