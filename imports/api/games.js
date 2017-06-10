@@ -87,6 +87,8 @@ Meteor.methods({
       throw new Meteor.Error('Invalid cards');
     }
 
+    // TODO: refactor to use switch-case statements
+
     if (game.currentHand.shownCards.length == 0) {
       console.log("Starting player: special card checks");
       // check to see player leads with cards of all same suit
@@ -116,39 +118,42 @@ Meteor.methods({
     // "single" errors are caught by above tests
 
     // check for doubles of a given suit in hand
-    let seen = []
-    let doubles = []
 
-    for (let c of game.players[userId].hand) {  // for each card in hand
-      if (c.suit == game.currentHand.suit) {    // filter by suit
-        if (seen.includes(c.value)) {           // if seen before
-          doubles.push(c.value);                // add to doubles
-        }
-        seen.push(c.value);                     // add to seen list
-      }
-    }
-    double.sort((a, b) => { return a - b });
+    if (game.currentHand.pattern != 'single') {
+      let seen = []
+      let doubles = []
 
-    // check for errors in "double"
-    if (game.currentHand.pattern == "double") {
-      if (cards[0].value != cards[1].value) {       // if didn't play double
-        if (doubles.length > 0) {                   // make sure no doubles in hand
-          throw new Meteor.Error('Must play double in suit');;
-        }  
-      }
-    }
-
-    // check for errors in "consecutive_double"
-    if (game.currentHand.pattern = "consecutive_double") {
-      if (cards[0].value != cards[1].value || 
-          cards[2].value != cards[3].value || 
-          cards[2].value != (cards[1].value+1)) {
-        
-        doubles.forEach((v, i) => {      // check for no cons-doubles in suit
-          if (i > 0 && (doubles[i-1] + 1 == v)) {
-            throw new Meteor.Error('Must play consecutive double in suit');
+      for (let c of game.players[userId].hand) {  // for each card in hand
+        if (c.suit == game.currentHand.suit) {    // filter by suit
+          if (seen.includes(c.value)) {           // if seen before
+            doubles.push(c.value);                // add to doubles
           }
-        });
+          seen.push(c.value);                     // add to seen list
+        }
+      }
+      doubles.sort((a, b) => { return a - b });
+
+      // check for errors in "double"
+      if (game.currentHand.pattern == "double") {
+        if (cards[0].value != cards[1].value) {       // if didn't play double
+          if (doubles.length > 0) {                   // make sure no doubles in hand
+            throw new Meteor.Error('Must play double in suit');;
+          }  
+        }
+      }
+
+      // check for errors in "consecutive_double"
+      if (game.currentHand.pattern = "consecutive_double") {
+        if (cards[0].value != cards[1].value || 
+            cards[2].value != cards[3].value || 
+            cards[2].value != (cards[1].value+1)) {
+          
+          doubles.forEach((v, i) => {      // check for no cons-doubles in suit
+            if (i > 0 && (doubles[i-1] + 1 == v)) {
+              throw new Meteor.Error('Must play consecutive double in suit');
+            }
+          });
+        }
       }
     }
   },
@@ -199,6 +204,19 @@ Meteor.methods({
       }
     }
     
+
+    cards.sort((a, b) => {
+      if (a.suit == "Trump" && b.suit != "Trump") {
+        return 1;
+      } 
+
+      if (a.suit != "Trump" && b.suit == "Trump") {
+        return -1;
+      }
+
+      return a.value - b.value; 
+    });
+
     // put cards into currentHand
     game.currentHand.shownCards.push({
       "userId": userId,
@@ -234,12 +252,87 @@ Meteor.methods({
     
     game.currentHand.currentPlayer = game.playerIds[(playerIndex + 1) % game.playerIds.length];
 
+    let getPoints = (hands) => { 
+      let sum = 0;
+      hands.forEach((hand) => {           // for each hand
+        hand.cards.forEach((card) => {    // for each card
+          if (card.value == 5) {          // check for 5, 10, K
+              sum += 5; 
+          } else if (card.value == 10 || card.value == 13) {
+            sum += 10
+          }
+        });
+      });
+      return sum; 
+    };
+
+    let getWinner = (hands, valid) => {
+      let max = -Infinity,
+          winner = null;
+
+      values.forEach((play) => {              
+
+        if (!valid(play.cards)) {
+          return; 
+        }
+
+        let value = 0;                        // default value: 0
+        switch (play.cards[0].suit) {
+          case "Trump":                       // trump suit: add 100 to value
+            value += 100; 
+          case game.currentHand.suit:         // starting suit: use card value
+            value += play.cards[0].value
+        }
+
+        if (max < +value) {                   // check against current max
+            max = +value; 
+            winner = play.userId; 
+        }
+      });
+
+      return winner; 
+    };
 
     // all players have played
     if (game.currentHand.shownCards.length == game.playerIds.length) {
-      // check to see who won
-      // Put point cards into points won for player
-      // currentHand into previousHands, create new currentHand
+
+      let matchPattern = null; 
+      switch (game.currentHand.pattern) {
+        case 'single':
+          matchPattern = (playedCards) => {
+            return true;
+          }
+          break;
+
+        case 'double':
+          matchPattern = (playedCards) => {
+            return (playedCards[0].suit == playedCards[1].suit) &&
+                   (playedCards[0].value == playedCards[1].value);
+          }
+          break;
+
+        case 'consecutive_double': 
+          matchPattern = (playedCards) => {
+            return (playedCards[0].suit == playedCards[1].suit) &&
+                   (playedCards[0].value == playedCards[1].value);
+          }
+          break; 
+      }
+
+      let winner = getWinner(game.currentHand.shownCards, matchPattern);
+      let points = getPoints(game.currentHand.shownCards);
+
+      // WHERE DO WE PUT THE POINTS?????
+
+      game.previousHands.push(currentHand);
+
+      game.currentHand = {
+        shownCards: [],   
+        currentPlayer: winner,
+        pattern: null, 
+        suit: null
+      };
+
     }
     
     // check to see end of game

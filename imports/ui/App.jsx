@@ -220,6 +220,7 @@ class App extends Component {
 
                 {this.state.inGame ? 
                 <div>
+                    {this.props.currentUser._id}
                     {this.renderTable()}
                     {this.renderHand()}
                 </div>
