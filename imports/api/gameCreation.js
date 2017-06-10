@@ -11,8 +11,6 @@ GameFactory.createGame = function(playerIds, gameType){
 
   GameFactory.dealPlayers(players, deck);
 
-  console.log("new code");
-
   return {
     //Maybe add a field for unique game id? As of now this is unique because of db id
     deck: deck,   // bottom  
@@ -23,6 +21,7 @@ GameFactory.createGame = function(playerIds, gameType){
     gameType: gameType,
     trumpNum: 2,
     trumpSuit: "Trump",
+    roundNumber: 1,
     currentHand: {
       shownCards: [],   // dict of playerID + cards played
       currentPlayer: playerIds[0],

@@ -8,7 +8,7 @@ import './gameCreation.js';
 
 export const Games = new Mongo.Collection('games');
 
-/*
+/* TODO: OUTDATED NEEDS UPDATING BASED ON gameCreation.js
 game = {
   deck: [], //This will be the bottom cards once dealt out
   playerIds: [],
@@ -32,6 +32,7 @@ game = {
   },
   trumpSuit: String,
   currentTurn: [],
+  roundNumber: 1,
   inProgress: true/false,
   started: date,
   finished: date

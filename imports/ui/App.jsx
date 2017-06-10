@@ -200,8 +200,13 @@ class App extends Component {
 
         const game = this.props.games[search];
 
-        this.setState({currentGameId: game._id});
-        this.setState({inGame: true});
+        this.setState({currentGameId: game._id, inGame: true});
+    }
+
+    backToMenu(event){
+        event.preventDefault();
+        this.setState({inGame: false, selectedUsers: [], selectedGames: []})
+
     }
 
     render() {
@@ -231,13 +236,22 @@ class App extends Component {
                 </div>
                 }
                 {this.state.inGame ?
-                    <form className="submit-hand" onSubmit={this.submitHand.bind(this)}>
-                        <input
-                            type='submit'
-                            value="Submit"
-                            name="submit-hand"
-                        />
-                    </form> 
+                    <div>
+                        <form className="submit-hand" onSubmit={this.submitHand.bind(this)}>
+                            <input
+                                type='submit'
+                                value="Submit"
+                                name="submit-hand"
+                            />
+                        </form>
+                        <form className="back-to-menu" onSubmit={this.backToMenu.bind(this)}>
+                            <input
+                                type='submit'
+                                value="Back To Menu"
+                                name="back-to-menu"
+                            />
+                        </form>
+                    </div>
                 :
                     <div>
                         <form className="create-game" onSubmit={this.createGame.bind(this)}>

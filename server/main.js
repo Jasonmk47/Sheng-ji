@@ -16,16 +16,10 @@ Meteor.publish("games", function(){
 
 	data = Games.find(
 		{ "playerIds": currentUserId },
-		//Selectively send card data
-		// fields: {
-
-		// }
 	);
 
 	//manipulate data here
 	//Make sure this doesn't affect persistent db information
-//    data.update();
-
 
 
 	if (data) return data;
