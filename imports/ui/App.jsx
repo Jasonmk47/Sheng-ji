@@ -36,6 +36,7 @@ class App extends Component {
             nextState.inGame = false;
             nextState.selectedGames = [];
             nextState.selectedUsers = [];
+            nextState.play = [];
         }
     }
 

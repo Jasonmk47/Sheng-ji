@@ -104,6 +104,7 @@ Meteor.methods({
 
     // check length of submitted cards, and pattern
     if (cards.length != game.currentHand.shownCards[0].cards.length) {
+
       throw new Meteor.Error('Does not match starting pattern');
     }
 
@@ -206,6 +207,9 @@ Meteor.methods({
     }
     
 
+    console.log("pattern: " + game.currentHand.pattern);
+
+
     cards.sort((a, b) => {
       if (a.suit == "Trump" && b.suit != "Trump") {
         return 1;
@@ -271,6 +275,7 @@ Meteor.methods({
       let max = -Infinity,
           winner = null;
 
+      //values here breaks everything
       values.forEach((play) => {              
 
         if (!valid(play.cards)) {

@@ -25,14 +25,14 @@ export default class Table extends Component {
                     <Card key={card.id} card={card} toggleToPlay={this.toggleToPlay}/>
                     ))}
             </div>
-            ));
+        ));
     }
 
 	render() {
 	    const tableClassName = classnames('table');
 
 		return (
-			<div className={tableClassName} style={{width:'100%'}}>
+			<div key={this.props.gameId + "test"} className={tableClassName} style={{width:'100%'}}>
 				{this.renderCards()}
             </div>
 		);
