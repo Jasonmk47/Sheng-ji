@@ -82,7 +82,7 @@ Meteor.methods({
       let validValue = !(card.value < 1 || card.value > 14);
 
       return validSuit && validValue; 
-    }); 
+    });
 
     if (!validCards) {
       throw new Meteor.Error('Invalid cards');

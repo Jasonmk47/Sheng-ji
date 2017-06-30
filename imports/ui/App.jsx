@@ -222,7 +222,7 @@ class App extends Component {
                     <AccountsUIWrapper />
  
                 </header>
-
+                {this.state.currentUser ? <div>yes</div> : <div>no</div>}
                 {this.state.inGame ? 
                 <div>
                     {this.props.currentUser._id}

@@ -16,7 +16,7 @@ export default class Card extends Component {
 		if (this.props.toggleToPlay(this.props.card))
 	    	this.setState({selected: !this.state.selected});
 	    else
-	    	conosle.log("Invalid card combination");
+	    	console.log("Invalid card combination");
 	    	//We can do rejection animations here
   	}
 

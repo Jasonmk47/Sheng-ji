@@ -9,18 +9,23 @@ export default class Table extends Component {
         super(props);
     }
 
+    toggleToPlay() {
+        return true;
+    }
+
     //TODO: sort the cards by suit
     renderCards(){
         const game = this.props.games.find( game => {if(game._id == this.props.gameId) return game;} );
 
         return game.currentHand.shownCards.map((play) => (
-            <div> 
+            <div key={play._id}> 
                 { play.userId } 
 
                 { play.cards.map((card) => (
-                    <Card key={card.id} card={card}/>
+                    <Card key={card.id} card={card} toggleToPlay={this.toggleToPlay}/>
                     ))}
-            </div>));
+            </div>
+            ));
     }
 
 	render() {
