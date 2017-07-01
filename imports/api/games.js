@@ -276,7 +276,7 @@ Meteor.methods({
           winner = null;
 
       //values here breaks everything
-      values.forEach((play) => {              
+      hands.forEach((play) => {              
 
         if (!valid(play.cards)) {
           return; 
@@ -334,7 +334,7 @@ Meteor.methods({
 
       // WHERE DO WE PUT THE POINTS?????
 
-      game.previousHands.push(currentHand);
+      game.previousHands.push(game.currentHand);
 
       game.currentHand = {
         shownCards: [],   
