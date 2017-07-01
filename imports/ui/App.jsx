@@ -153,6 +153,9 @@ class App extends Component {
         });
 
         Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser._id);
+
+        this.setState({play: []})
+
     }
 
     deleteGame(event) {
