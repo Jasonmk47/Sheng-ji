@@ -110,8 +110,9 @@ Meteor.methods({
 
     // check suit of each card and if player is out of suit
     if (!cards.every((card) => { return card.suit == game.currentHand.suit })) {
-      let myCards = game.players[playerId].hand;                          // get current hand 
-      let tempCards = myCards.filter((c) => {return !cards.includes(c)}); // get hand without played cards
+      let myCards = game.players[userId].hand;                          // get current hand 
+      //TODO: Fix this include, I believe it is not properly working and therefore never filtering anything out
+      let tempCards = myCards.filter((c) => {return !cards.includes(c)}); // get hand without played cards 
       if (!tempCards.every((c) => {c.suit != game.currentHand.suit})) {   // check to see none of suit left
         throw new Meteor.Error('Does not match starting suit');
       }
@@ -145,7 +146,7 @@ Meteor.methods({
       }
 
       // check for errors in "consecutive_double"
-      if (game.currentHand.pattern = "consecutive_double") {
+      if (game.currentHand.pattern == "consecutive_double") {
         if (cards[0].value != cards[1].value || 
             cards[2].value != cards[3].value || 
             cards[2].value != (cards[1].value+1)) {
@@ -191,7 +192,7 @@ Meteor.methods({
             // error or shuai
           }
           break;
-        case 4:
+        case 4: //This assumes that the cards are in order of size
           if (cards[0].value == cards[1].value && 
               cards[2].value == cards[3].value && 
               cards[2].value == (cards[1].value+1)) {
@@ -275,7 +276,7 @@ Meteor.methods({
       let max = -Infinity,
           winner = null;
 
-      //values here breaks everything
+
       hands.forEach((play) => {              
 
         if (!valid(play.cards)) {

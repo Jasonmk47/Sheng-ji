@@ -50,12 +50,14 @@ class App extends Component {
             this.setState((prevState) => ({
                 play: prevState.play.filter((_, i) => i !== index)
             }));
+            console.log("removing card")
         }
         else {
             //http://stackoverflow.com/questions/26505064/react-js-what-is-the-best-way-to-add-a-value-to-an-array-in-state
             this.setState(previousState => ({
                 play: previousState.play.concat(card)
             }));
+            console.log("adding card")
         }
         return true;
     }
@@ -144,6 +146,9 @@ class App extends Component {
             return false;
         }
 
+        console.log(this.state.play)
+
+
         Meteor.call('games.checkCards', this.state.play, this.state.currentGameId, 
             this.props.currentUser._id, (error) => { 
                 if (error) {
@@ -152,10 +157,16 @@ class App extends Component {
                 } 
         });
 
-        Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser._id);
+        const self = this;
 
-        this.setState({play: []})
-
+        Meteor.call('games.submit', this.state.play, this.state.currentGameId, this.props.currentUser._id, function(err, data) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                //Only if it was successful
+                self.setState({play: []})}
+            });
     }
 
     deleteGame(event) {
