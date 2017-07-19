@@ -110,10 +110,13 @@ Meteor.methods({
 
     // check suit of each card and if player is out of suit
     if (!cards.every((card) => { return card.suit == game.currentHand.suit })) {
-      let myCards = game.players[userId].hand;                          // get current hand 
-      //TODO: Fix this include, I believe it is not properly working and therefore never filtering anything out
-      let tempCards = myCards.filter((c) => {return !cards.includes(c)}); // get hand without played cards 
-      if (!tempCards.every((c) => {c.suit != game.currentHand.suit})) {   // check to see none of suit left
+      let myCards = game.players[userId].hand;                          // get current hand
+
+      let tempCards = myCards.filter((c) => {return !cards.some(function(card){
+        return (c.id === card.id)
+      })}); // get hand without played cards 
+
+      if (!tempCards.every((c) => {return c.suit !== game.currentHand.suit})) {   // check to see none of suit left
         throw new Meteor.Error('Does not match starting suit');
       }
     }
