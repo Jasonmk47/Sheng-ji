@@ -79,7 +79,7 @@ Meteor.methods({
     var validCards = cards.every((card) => {
     
       let validSuit = ['clubs', 'diamonds', 'hearts', 'spades', 'Trump'].includes(card.suit);
-      let validValue = !(card.value < 1 || card.value > 14);
+      let validValue = !(card.value < 1 || card.value > 16);
 
       return validSuit && validValue; 
     });
