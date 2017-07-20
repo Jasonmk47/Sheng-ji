@@ -90,7 +90,7 @@ Meteor.methods({
 
     // TODO: refactor to use switch-case statements
 
-    if (game.currentHand.shownCards.length == 0) {
+    if (game.currentHand.shownCards.length == game.playerIds.length || game.currentHand.shownCards.length == 0) {
       console.log("Starting player: special card checks");
       // check to see player leads with cards of all same suit
       if (!cards.every((card) => { return card.suit == cards[0].suit })) {
@@ -178,6 +178,11 @@ Meteor.methods({
 
     // error checking and all that jazz
     Meteor.call("games.checkCards", cards, gameId, userId);
+
+    if (game.currentHand.shownCards.length == game.playerIds.length) {
+      game.currentHand.shownCards = [];
+    }
+
 
     // if we are the starting player
     if (game.currentHand.shownCards.length == 0) {
@@ -341,7 +346,7 @@ Meteor.methods({
       game.previousHands.push(game.currentHand);
 
       game.currentHand = {
-        shownCards: [],   
+        shownCards: game.currentHand.shownCards,   
         currentPlayer: winner,
         pattern: null, 
         suit: null
