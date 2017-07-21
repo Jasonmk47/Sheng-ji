@@ -183,10 +183,20 @@ Meteor.methods({
       game.currentHand.shownCards = [];
     }
 
-
     // if we are the starting player
     if (game.currentHand.shownCards.length == 0) {
       game.currentHand.suit = cards[0].suit;
+
+      let identifyShuai = (cards) => {
+        let chosenSuit = cards[0].suit;
+        if (cards.every((card) => card.suit == chosenSuit)) {
+          game.currentHand.pattern = "shuai " + chosenSuit; 
+        }
+        else {
+          //Shouldn't get here, check should find the error
+          game.currentHand.pattern = "error";
+        }
+      };
 
       // figure out pattern (shuai not included for now)
       switch (cards.length) {
@@ -197,20 +207,29 @@ Meteor.methods({
           if (cards[0].value == cards[1].value) {
             game.currentHand.pattern = "double"; 
           } else {
+            identifyShuai(cards);
             // error or shuai
           }
           break;
-        case 4: //This assumes that the cards are in order of size
-          if (cards[0].value == cards[1].value && 
-              cards[2].value == cards[3].value && 
-              cards[2].value == (cards[1].value+1)) {
+        case 4:
+
+          var lowestCard = cards[0];
+          for (var i = 1; i < 4; i++)
+            if (lowestCard.id > cards[i]) lowestCard = cards[i];
+
+          if ((lowestCard.value == cards[0].value || lowestCard.value == (cards[0].value+1))  && 
+              (lowestCard.value == cards[1].value || lowestCard.value == (cards[1].value+1))  && 
+              (lowestCard.value == cards[2].value || lowestCard.value == (cards[2].value+1))  && 
+              (lowestCard.value == cards[3].value || lowestCard.value == (cards[3].value+1)) ) {
             game.currentHand.pattern = "consecutive_double";
           } else {
+            identifyShuai(cards);
             // error or shuai
           }
           break;
         default: 
-          // error
+          identifyShuai(cards);
+          // error or shuai
           break;
       }
     }
@@ -331,9 +350,14 @@ Meteor.methods({
               return false;
             }
 
-            return (playedCards[0].value == playedCards[1].value) &&
-                   (playedCards[2].value == playedCards[3].value) && 
-                   (playedCards[1].value == playedCards[2].value - 1);
+            var lowestCard = playedCards[0];
+            for (var i = 1; i < 4; i++)
+              if (lowestCard.id > cards[i]) lowestCard = cards[i];
+
+            return ((lowestCard.value == cards[0].value || lowestCard.value == (cards[0].value+1))  && 
+                (lowestCard.value == cards[1].value || lowestCard.value == (cards[1].value+1))  && 
+                (lowestCard.value == cards[2].value || lowestCard.value == (cards[2].value+1))  && 
+                (lowestCard.value == cards[3].value || lowestCard.value == (cards[3].value+1)))
           }
           break; 
       }
