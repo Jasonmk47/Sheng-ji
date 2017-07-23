@@ -233,14 +233,15 @@ class App extends Component {
             <div className="container">
                 <header>
                     <h1>Sheng-ji</h1>
-    
+
                     <AccountsUIWrapper />
- 
+
                 </header>
-                {this.state.currentUser ? <div>yes</div> : <div>no</div>}
                 {this.state.inGame ? 
                 <div>
-                    {this.props.currentUser._id}
+                    {this.props.games.find( //This looks ugly, should format it better
+                        game => {if(game._id == this.state.currentGameId ) return game;}).currentHand.currentPlayer === this.props.currentUser._id ?
+                        <div>GO!!! It's your turn</div> : <div>It's not your turn</div>}
                     {this.renderTable()}
                     {this.renderHand()}
                 </div>
