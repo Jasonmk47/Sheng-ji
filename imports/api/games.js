@@ -365,7 +365,7 @@ Meteor.methods({
       let winner = getWinner(game.currentHand.shownCards, matchPattern);
       let points = getPoints(game.currentHand.shownCards);
 
-      // WHERE DO WE PUT THE POINTS?????
+      game.players[winner].points += points;
 
       game.previousHands.push(game.currentHand);
 
@@ -379,24 +379,15 @@ Meteor.methods({
     }
     
     // check to see end of game
-    // if( allHandsEmpty(game.players)){
-    //   if( game.deck.length > 0){
-    //     GameFactory.dealPlayers(game.players, game.deck);
-    //   }else{
-    //     scoreGame(game);
-    //   }
-    // }
+    if( _.every(game.players, (player) => {return player.hand.length === 0})){
+      //Restart the game and increment player score
 
-    //Does not properly update db
+      //Display the final score
+       _.every(game.players, (player) => {console.log(player.points)})
+
+    }
+
     console.log(game);
     Games.update( gameId, game );
   },
-
 });
-
-
-// function allHandsEmpty(players){
-//   return _.every(players, function(player){
-//     return player.hand.length === 0;
-//   });
-// }

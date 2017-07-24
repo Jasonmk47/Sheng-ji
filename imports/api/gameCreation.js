@@ -50,8 +50,8 @@ function createPlayers(ids){
   ids.forEach(function(id){
     o[id] = {
       hand  : [],
-      points: 0
-      //card  : [], // what card are they on, probably game-level
+      points: 0,
+      overallScore: 2, //On 2s to start
     };
   });
 
