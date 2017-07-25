@@ -8,35 +8,43 @@ import './gameCreation.js';
 
 export const Games = new Mongo.Collection('games');
 
-/* TODO: OUTDATED NEEDS UPDATING BASED ON gameCreation.js
+// Types of the fields of the objects //
+/*
+card = {
+  id: int,                //Individual id per card
+  suit: string,           //suit or Trump
+  value: int,
+  name: string
+};
+
+player = {
+  hand: [card],
+  points: int,
+  overallScore: int,      //On 2s to start
+};
+
 game = {
-  deck: [], //This will be the bottom cards once dealt out
-  playerIds: [],
-  players:{
-    a:{
-      hand :[],
-      points: [],
+    deck: [card],         // the bottom  
+    plays: [],            // records past plays
+    playerIds: playerIds, //Array of playerIds
+    startingPlayer: string,
+    players: {},          //Object with all of the players keyed by id
+    gameType: string,   
+    trumpNum: int,
+    trumpSuit: string,
+    roundNumber: int,
+    currentHand: {
+      shownCards: [],     // dict of playerID + cards played
+      currentPlayer: string,
+      pattern: string, 
+      suit: string
     },
-    b:{
-      hand :[],
-      points: [],
-    },
-    c:{
-      hand :[],
-      points: [],
-    },
-    d:{
-      hand :[],
-      points: [],
-    },
-  },
-  trumpSuit: String,
-  currentTurn: [],
-  roundNumber: 1,
-  inProgress: true/false,
-  started: date,
-  finished: date
-}
+    previousHands: [],
+
+    inProgress: bool,
+    started: Date,
+    finished: int 
+  };
 */
 
 Meteor.methods({
@@ -190,7 +198,7 @@ Meteor.methods({
       let identifyShuai = (cards) => {
         let chosenSuit = cards[0].suit;
         if (cards.every((card) => card.suit == chosenSuit)) {
-          game.currentHand.pattern = "shuai " + chosenSuit; 
+          game.currentHand.pattern = "shuai"; 
         }
         else {
           //Shouldn't get here, check should find the error
@@ -299,6 +307,7 @@ Meteor.methods({
       return sum; 
     };
 
+    //TODO: This needs some way to remove all lower importance cards in Shuais
     let getWinner = (hands, valid) => {
       let max = -Infinity,
           winner = null;
@@ -359,7 +368,18 @@ Meteor.methods({
                 (lowestCard.value == cards[2].value || lowestCard.value == (cards[2].value+1))  && 
                 (lowestCard.value == cards[3].value || lowestCard.value == (cards[3].value+1)))
           }
-          break; 
+          break;
+          case 'shuai':
+            matchPattern = (playedCards) => {
+              //All need to be the same suit
+              const firstSuitPlayed = playedCards[0].suit;
+              if (!playedCards.every((card) => {card.suit === firstSuitPlayed})) {console.log("Not in suit"); return false};
+
+              //TODO: We need some way to check the consecutive pairs and pairs condition is met
+
+              return true;
+            }
+          break;
       }
 
       let winner = getWinner(game.currentHand.shownCards, matchPattern);
@@ -378,6 +398,7 @@ Meteor.methods({
 
     }
     
+    //TODO: I think this is broken
     // check to see end of game
     if( _.every(game.players, (player) => {return player.hand.length === 0})){
       //Restart the game and increment player score

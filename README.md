@@ -3,22 +3,16 @@ Online version of Sheng-Ji or 80 points
 
 Getting started
 
-Download Meteor
+-Download Meteor
+-Download node
+-meteor npm install
+-Type the command 'meteor' in the parent folder to start the server.
 
-Download node
-
-meteor npm install
-
-Type the command 'meteor' in the parent folder to start the server.
-
-Make 4 users. (Sign up - Sign out repeatedly)
-You will see the users appear in a list.
-Click create a game. As of now, the game creation always takes the first 4 users in the db
-You will see the gameID appear in the list
-Click start game
-The list should disappear and the first game in the db will be loaded. ALl your cards should be listed
-If you click on the cards (like on the text) they are queued so the submit button calls game functionality on them.
-This needs to be animated.
+-Make 4 users (Sign up - Sign out repeatedly)
+-You will see the users appear in a list.
+-Select them and click create a game, the play order will be in the order you selected them.
+-Select the game that just appeared and click start game
+-Clicking on the cards selects them and plays when the submit button is clicked
 
 
 DB management
@@ -30,38 +24,33 @@ DB management
 	Viewing all collections in the db is 'show collections'
 
 
-TODOS:
-	Graphics - Making the card graphic.
-			   Making the board graphic.
-
-	Animations - Making selected cards highlight in some way
-				 Having dealt cards animate to your hand (bonus)
-
-	Server side - Figure out how to deal the cards slowly over time for calling trump suit
-
-	Meta topics - Figure out how to do game creation
-				  User management (Friends list? Chat room? Game rooms with invite link?)
-				  How to resume play? (We could just never end the games and have games able to be played over the course of days)
-
-	Game logic - How to call a trump suit
-				 Giving the bottom to defender
+FEATURES TODO:
+	Game logic - Figure out how to deal the cards slowly over time for calling trump suit
+				 How to call a trump suit
 				 Setting the bottom
 				 Flipping suit
-				 Playing hands and verifying validity
-				 Scoring points
+				 Playing shuai
 				 Going between rounds
-				 Winning
+				 Winning overall
+
+	Meta topics - Game management (Friends list? Generate room where you are added once you join?)
+				  Timer to make people play faster
+
+	Graphics - Have orientation of cards flipped for preference (bonus)
+
+	Animations - Having dealt cards animate to your hand (bonus)
 
 
-If you shuai (whatever I dont know how to write this), and you get rekt by someone else, do we show:
-	Everyone who can beat you
-	Show your hand but then auto turn it into a valid hand
-	Automatically just make your hand valid
+KNOWN BUGS:
+-You can select cards that are already played
+-If you select a game and someone else deletes it, you have to refresh the page else you cannot start a game
+-Occasionally, selecting cards doesn't work and you have to refresh the page (I have no idea why this happens, I thought this issue should be fixed)
+-You can play shuais but the game never rejects them and doesn't know how to score/check validity correctly
+-I'm pretty sure shuaing trump doesn't work
+-Trump number doesn't behave as trump
 
 
-Do we want a action log for what has happened so far?
-Or maybe a toggle for it?
 
-Do we want a timer?
-
-
+QUESTION:
+-If you shuai and you get rekt by someone else, how do we show the cards you tried + who can beat you?
+-Do we want an undo button?
