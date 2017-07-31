@@ -60,7 +60,7 @@ function createPlayers(ids){
  
 function createDeck(gameType){
   var suits = ['clubs', 'diamonds', 'hearts', 'spades'];
-  var trumpSuit = /* Donald */ 'Trump';
+  var trumpSuit = /* Donald */ 'trump';
   var cards = [];
 
   // # of decks
@@ -68,10 +68,12 @@ function createDeck(gameType){
 
   for (var j = 1; j <= gameProperties[gameType].deckCount; j++) {
     // for each suit in a deck
-    //Ace is 14 for value ordering
+    // Ace is 14 for value ordering
     suits.forEach(function(suit){
       for (var i=2; i<=14; i++){
         var name = i;
+        var isTrump = false;
+        if (i === 2) isTrump = true;
         if (i === 14)  name = 'ace';
         if (i === 11) name = 'jack';
         if (i === 12) name = 'queen';
@@ -80,7 +82,8 @@ function createDeck(gameType){
           id: index++,
           suit: suit,
           value: i,
-          name: name
+          name: name,
+          isTrump: isTrump
         });
       }
     });
@@ -89,14 +92,16 @@ function createDeck(gameType){
     cards.push({
       id: index++,
       suit: trumpSuit,
-      value: 14,
-      name: 'SJ'
+      value: 15,
+      name: 'SJ',
+      isTrump: true
     });
     cards.push({
       id: index++,
       suit: trumpSuit,
-      value: 15,
-      name: 'BJ'
+      value: 16,
+      name: 'BJ',
+      isTrump: true
     });
   }
 

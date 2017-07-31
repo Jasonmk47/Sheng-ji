@@ -86,8 +86,8 @@ Meteor.methods({
     // make sure each card has valid suit and value
     var validCards = cards.every((card) => {
     
-      let validSuit = ['clubs', 'diamonds', 'hearts', 'spades', 'Trump'].includes(card.suit);
-      let validValue = !(card.value < 1 || card.value > 16);
+      let validSuit = ['clubs', 'diamonds', 'hearts', 'spades', 'trump'].includes(card.suit);
+      let validValue = !(card.value < 1 || card.value > 17);
 
       return validSuit && validValue; 
     });
@@ -96,35 +96,47 @@ Meteor.methods({
       throw new Meteor.Error('Invalid cards');
     }
 
-    // TODO: refactor to use switch-case statements
-
-    if (game.currentHand.shownCards.length == game.playerIds.length || game.currentHand.shownCards.length == 0) {
+    // check for shuai 
+    // Starting hand must be all the same suit
+    if (game.currentHand.shownCards.length === game.playerIds.length || game.currentHand.shownCards.length === 0) {
       console.log("Starting player: special card checks");
       // check to see player leads with cards of all same suit
-      if (!cards.every((card) => { return card.suit == cards[0].suit })) {
-        throw new Meteor.Error('Cards of different suits');
+      if (cards[0].isTrump) {
+        if (!cards.every((card) => { return card.isTrump })) {
+          throw new Meteor.Error('Cards of different suits 1');
+        }
       }
-
-      // check for shuai 
+      else {
+        if (!cards.every((card) => { return card.suit == cards[0].suit })) {
+          throw new Meteor.Error('Cards of different suits 2');
+        }
+      }
 
       return; 
     }
 
     // check length of submitted cards, and pattern
-    if (cards.length != game.currentHand.shownCards[0].cards.length) {
-
+    if (cards.length !== game.currentHand.shownCards[0].cards.length) {
       throw new Meteor.Error('Does not match starting pattern');
     }
 
-    // check suit of each card and if player is out of suit
-    if (!cards.every((card) => { return card.suit == game.currentHand.suit })) {
-      let myCards = game.players[userId].hand;                          // get current hand
+    let myCards = game.players[userId].hand;
+    let newCards = myCards.filter((c) => {return !cards.some(function(card){
+      return (c.id === card.id)})}); // get hand without played cards
 
-      let tempCards = myCards.filter((c) => {return !cards.some(function(card){
-        return (c.id === card.id)
-      })}); // get hand without played cards 
+    // Need to play trump if in trump
+    if (game.currentHand.suit === game.trumpSuit || game.currentHand.suit === "trump" ){
+      if (!cards.every((card) => {return card.isTrump})) {
+        if (!newCards.every((c) => {return !c.isTrump})) {
+          throw new Meteor.Error('Must play trump you have');
+        }
+      }
+    } 
 
-      if (!tempCards.every((c) => {return c.suit !== game.currentHand.suit})) {   // check to see none of suit left
+    // Else need to play in suit
+    else if (!cards.every((card) => { return card.suit === game.currentHand.suit && card.value !== game.trumpNum})) {
+      console.log(game.currentHand.suit)
+      if (!newCards.every((c) => {return c.suit !== game.currentHand.suit || c.value === game.trumpNum})) {   // check to see none of suit left
         throw new Meteor.Error('Does not match starting suit');
       }
     }
@@ -133,12 +145,16 @@ Meteor.methods({
 
     // check for doubles of a given suit in hand
 
-    if (game.currentHand.pattern != 'single') {
+    if (game.currentHand.pattern !== 'single') {
+
+    //So far all usages use the current hand's suit so we could hard code it
+    let countDoubles = (cardsToCount, suit) => {
       let seen = []
       let doubles = []
 
-      for (let c of game.players[userId].hand) {  // for each card in hand
-        if (c.suit == game.currentHand.suit) {    // filter by suit
+      for (let c of cardsToCount) {  // for each card in hand
+        if ((c.suit === suit && c.value !== game.trumpNum) ||
+              ((suit === game.trumpSuit || suit === "trump") && c.isTrump)) {
           if (seen.includes(c.value)) {           // if seen before
             doubles.push(c.value);                // add to doubles
           }
@@ -146,27 +162,59 @@ Meteor.methods({
         }
       }
       doubles.sort((a, b) => { return a - b });
+      return doubles;
+    };
+
+    var doubles = countDoubles(game.players[userId].hand, game.currentHand.suit);
 
       // check for errors in "double"
-      if (game.currentHand.pattern == "double") {
-        if (cards[0].value != cards[1].value) {       // if didn't play double
+      if (game.currentHand.pattern === "double") {
+        if (cards[0].value !== cards[1].value) {       // if didn't play double
           if (doubles.length > 0) {                   // make sure no doubles in hand
-            throw new Meteor.Error('Must play double in suit');;
+            throw new Meteor.Error('Must play double in suit');
           }  
         }
       }
 
       // check for errors in "consecutive_double"
-      if (game.currentHand.pattern == "consecutive_double") {
-        if (cards[0].value != cards[1].value || 
-            cards[2].value != cards[3].value || 
-            cards[2].value != (cards[1].value+1)) {
+      if (game.currentHand.pattern === "consecutive_double") {
+        var lowestCard = cards[0];
+        for (var i = 1; i < 4; i++)
+          if (lowestCard.id > cards[i].id) lowestCard = cards[i];
+
+          var lowValue = lowestCard.value;
+          var higherValue = lowValue + 1;
+          
+          if (lowValue + 1 === game.trumpNum){
+            higherValue++;
+          }
+
+        if ((lowValue !== cards[0].value && higherValue !== cards[0].value)  || 
+            (lowValue !== cards[1].value && higherValue !== cards[1].value)  || 
+            (lowValue !== cards[2].value && higherValue !== cards[2].value)  || 
+            (lowValue !== cards[3].value && higherValue !== cards[3].value) ) {
           
           doubles.forEach((v, i) => {      // check for no cons-doubles in suit
-            if (i > 0 && (doubles[i-1] + 1 == v)) {
+            if (i > 0 && (doubles[i-1] + 1 === v)) {
               throw new Meteor.Error('Must play consecutive double in suit');
             }
           });
+          
+          // Not only can you not have as many doubles, you have to play them as well
+          if (doubles.length === 1) {                   // make sure no doubles in hand
+            //Have to play as many doubles as possible
+            if(countDoubles(cards, game.currentHand.suit).length !== 1) {
+              throw new Meteor.Error("Must play all doubles you have");
+            }
+
+          }
+          if (doubles.length > 1) {                   // make sure no doubles in hand
+            //Have to play as many doubles as possible
+            if(countDoubles(cards, game.currentHand.suit).length !== 2) {
+              throw new Meteor.Error("Must play all doubles");
+            }
+          }
+
         }
       }
     }
@@ -182,23 +230,26 @@ Meteor.methods({
     var game = Games.findOne({_id: gameId});
     var hand = game.players[userId].hand;
 
-    /*TODO: Game logic here*/
-
     // error checking and all that jazz
     Meteor.call("games.checkCards", cards, gameId, userId);
 
-    if (game.currentHand.shownCards.length == game.playerIds.length) {
+    if (game.currentHand.shownCards.length === game.playerIds.length) {
       game.currentHand.shownCards = [];
     }
 
     // if we are the starting player
     if (game.currentHand.shownCards.length == 0) {
-      game.currentHand.suit = cards[0].suit;
+      if (cards[0].value === game.trumpNum) {
+        game.currentHand.suit = 'trump'; 
+      }
+      else {
+        game.currentHand.suit = cards[0].suit;
+      }
 
       let identifyShuai = (cards) => {
         let chosenSuit = cards[0].suit;
-        if (cards.every((card) => card.suit == chosenSuit)) {
-          game.currentHand.pattern = "shuai"; 
+        if (cards.every((card) => card.suit === chosenSuit) || cards.every((card) => {card.isTrump})) {
+          game.currentHand.pattern = "shuai"; //We can add on here to specify what type of shuai
         }
         else {
           //Shouldn't get here, check should find the error
@@ -220,15 +271,21 @@ Meteor.methods({
           }
           break;
         case 4:
-
           var lowestCard = cards[0];
           for (var i = 1; i < 4; i++)
-            if (lowestCard.id > cards[i]) lowestCard = cards[i];
+            if (lowestCard.id > cards[i].id) lowestCard = cards[i];
 
-          if ((lowestCard.value == cards[0].value || lowestCard.value == (cards[0].value+1))  && 
-              (lowestCard.value == cards[1].value || lowestCard.value == (cards[1].value+1))  && 
-              (lowestCard.value == cards[2].value || lowestCard.value == (cards[2].value+1))  && 
-              (lowestCard.value == cards[3].value || lowestCard.value == (cards[3].value+1)) ) {
+              var lowValue = lowestCard.value;
+              var higherValue = lowValue + 1;
+              
+              if (lowValue + 1 === game.trumpNum){
+                higherValue++;
+              }
+
+          if ((lowValue === cards[0].value || higherValue === cards[0].value)  && 
+              (lowValue === cards[1].value || higherValue === cards[1].value)  && 
+              (lowValue === cards[2].value || higherValue === cards[2].value)  && 
+              (lowValue === cards[3].value || higherValue === cards[3].value) ) {
             game.currentHand.pattern = "consecutive_double";
           } else {
             identifyShuai(cards);
@@ -247,11 +304,11 @@ Meteor.methods({
 
 
     cards.sort((a, b) => {
-      if (a.suit == "Trump" && b.suit != "Trump") {
+      if (a.isTrump && !b.suit.isTrump) {
         return 1;
       } 
 
-      if (a.suit != "Trump" && b.suit == "Trump") {
+      if (!a.isTrump && b.suit.isTrump) {
         return -1;
       }
 
@@ -264,21 +321,10 @@ Meteor.methods({
       "cards": cards,
     });
 
-    //Throw away cards that are done
-    // var myCards = game.players[userId].hand;
-    // myCards = myCards.filter( (card) => {
-    //   cards.map((pos))
-    //   return !cards.includes(card);
-    // });
-    // game.players[userId].hand = myCards;
-    // console.log(myCards);
-
+    //Remove cards you are finished with
     _.each(cards, function (card) {
       game.players[userId].hand = game.players[userId].hand.map(function (card_i) {
-        if (card_i.value === card.value && card_i.suit === card.suit && card_i.id === card.id ) {
-          return;
-        }
-        else {
+        if (card_i.id !== card.id ) {
           return card_i;
         }
       }).filter(function(card_j) {
@@ -288,7 +334,7 @@ Meteor.methods({
 
     // move onto next player
     const playerIndex = game.playerIds.findIndex((id) => {
-        return (userId == id);
+        return (userId === id);
     });
     
     game.currentHand.currentPlayer = game.playerIds[(playerIndex + 1) % game.playerIds.length];
@@ -312,32 +358,35 @@ Meteor.methods({
       let max = -Infinity,
           winner = null;
 
-
-      hands.forEach((play) => {              
+      hands.forEach((play) => {               // If this goes in the order of play then this should work by assigning winner to first play     
 
         if (!valid(play.cards)) {
           return; 
         }
 
         let value = 0;                        // default value: 0
-        switch (play.cards[0].suit) {
-          case "Trump":                       // trump suit: add 100 to value
-            value += 100; 
-          case game.currentHand.suit:         // starting suit: use card value
-            value += play.cards[0].value
-        }
+
+        if (play.cards[0].suit === "trump" || play.cards[0].value === game.trumpNum)
+          value += 100 + play.cards[0].value;
+        else if (play.cards[0].suit === game.trumpSuit) //important to be else if so in suit trump number is ok
+          value += 50 + play.cards[0].value;                     
+        else if (play.cards[0].suit === game.currentHand.suit)
+          value += play.cards[0].value;
+
+        if (play.cards[0].value === game.trumpNum && play.cards[0].suit === game.trumpSuit)
+          value ++;
 
         if (max < +value) {                   // check against current max
             max = +value; 
             winner = play.userId; 
         }
       });
-
+      
       return winner; 
     };
 
     // all players have played
-    if (game.currentHand.shownCards.length == game.playerIds.length) {
+    if (game.currentHand.shownCards.length === game.playerIds.length) {
 
       let matchPattern = null; 
       switch (game.currentHand.pattern) {
@@ -354,26 +403,41 @@ Meteor.methods({
 
         case 'consecutive_double': 
           matchPattern = (playedCards) => {
-            
-            if (!playedCards.forEach((card) => { return card.suit == playedCards[0].suit })) {
+            if (!playedCards.every((card) => { return card.suit === playedCards[0].suit })) {
               return false;
             }
-
             var lowestCard = playedCards[0];
             for (var i = 1; i < 4; i++)
-              if (lowestCard.id > cards[i]) lowestCard = cards[i];
+              if (lowestCard.id > playedCards[i].id) lowestCard = playedCards[i];
 
-            return ((lowestCard.value == cards[0].value || lowestCard.value == (cards[0].value+1))  && 
-                (lowestCard.value == cards[1].value || lowestCard.value == (cards[1].value+1))  && 
-                (lowestCard.value == cards[2].value || lowestCard.value == (cards[2].value+1))  && 
-                (lowestCard.value == cards[3].value || lowestCard.value == (cards[3].value+1)))
+              var lowValue = lowestCard.value;
+              var higherValue = lowValue + 1;
+              
+              if (lowValue + 1 === game.trumpNum){
+                higherValue++;
+              }
+
+            return ((lowValue === playedCards[0].value || higherValue === playedCards[0].value)  && 
+                (lowValue === playedCards[1].value || higherValue === playedCards[1].value)  && 
+                (lowValue === playedCards[2].value || higherValue === playedCards[2].value)  && 
+                (lowValue === playedCards[3].value || higherValue === playedCards[3].value))
           }
           break;
           case 'shuai':
             matchPattern = (playedCards) => {
               //All need to be the same suit
-              const firstSuitPlayed = playedCards[0].suit;
-              if (!playedCards.every((card) => {card.suit === firstSuitPlayed})) {console.log("Not in suit"); return false};
+              if (playedCards[0].isTrump) {
+                if (!playedCards.every((card) => {return card.isTrump})) {
+                  console.log("Not same suit, trump");
+                  return false
+                };
+              }
+              else {
+                if (!playedCards.every((card) => {return card.suit === playedCards[0].suit})) {
+                  console.log("Not same suit, not trump"); 
+                  return false
+                };
+              }
 
               //TODO: We need some way to check the consecutive pairs and pairs condition is met
 
@@ -402,9 +466,12 @@ Meteor.methods({
     // check to see end of game
     if( _.every(game.players, (player) => {return player.hand.length === 0})){
       //Restart the game and increment player score
+      console.log("game is done")
 
       //Display the final score
-       _.every(game.players, (player) => {console.log(player.points)})
+      Object.keys(game.players).forEach(function(player){
+        console.log(player.points);
+      });
 
     }
 

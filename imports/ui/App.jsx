@@ -224,8 +224,7 @@ class App extends Component {
 
     backToMenu(event){
         event.preventDefault();
-        this.setState({inGame: false, selectedUsers: [], selectedGames: []})
-
+        this.setState({inGame: false, selectedUsers: [], selectedGames: [], play: []})
     }
 
     render() {
