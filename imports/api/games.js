@@ -459,18 +459,16 @@ Meteor.methods({
         pattern: null, 
         suit: null
       };
-
     }
-    
-    //TODO: I think this is broken
+
     // check to see end of game
     if( _.every(game.players, (player) => {return player.hand.length === 0})){
       //Restart the game and increment player score
       console.log("game is done")
 
       //Display the final score
-      Object.keys(game.players).forEach(function(player){
-        console.log(player.points);
+      Object.keys(game.players).forEach(function(id){
+        console.log(game.players[id]);
       });
 
     }
