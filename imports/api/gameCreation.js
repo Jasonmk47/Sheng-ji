@@ -20,7 +20,8 @@ GameFactory.createGame = function(playerIds, gameType){
     players: players,
     gameType: gameType,
     trumpNum: 2,
-    trumpSuit: "Trump",
+    trumpSuit: "trump",
+    hasCalledSuit: false,
     roundNumber: 1,
     currentHand: {
       shownCards: [],   // dict of playerID + cards played

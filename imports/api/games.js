@@ -32,6 +32,7 @@ game = {
     gameType: string,   
     trumpNum: int,
     trumpSuit: string,
+    hasCalledSuit: bool,
     roundNumber: int,
     currentHand: {
       shownCards: [],     // dict of playerID + cards played
@@ -110,7 +111,7 @@ Meteor.methods({
         if (!cards.every((card) => { return card.suit == cards[0].suit })) {
           throw new Meteor.Error('Cards of different suits 2');
         }
-      }
+      } 
 
       return; 
     }

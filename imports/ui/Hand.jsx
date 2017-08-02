@@ -13,24 +13,56 @@ export default class Hand extends Component {
     renderCards(){
         const game = this.props.games.find( game => {if(game._id == this.props.gameId) return game;} );
 
+        var ordering = {};
+
+        ordering["trump"] = 0;
+
+        if (game.trumpSuit === 'spades') {
+            ordering['spades'] = 3;
+            ordering['hearts'] = 2;
+            ordering['clubs'] = 1;
+            ordering['diamonds'] = 0;
+        }
+        else if (game.trumpSuit === "hearts") {
+            ordering['hearts'] = 3;
+            ordering['spades'] = 2;
+            ordering['diamonds'] = 1;
+            ordering['clubs'] = 0;
+        }
+        else if (game.trumpSuit === "diamonds") {
+            ordering['diamonds'] = 3;
+            ordering['spades'] = 2;
+            ordering['hearts'] = 1;
+            ordering['clubs'] = 0;
+        }
+        else{
+            ordering['clubs'] = 3;
+            ordering['hearts'] = 2;
+            ordering['spades'] = 1;
+            ordering['diamonds'] = 0;
+        }
+
         return game.players[this.props.currentUser._id].hand.map((card) => (
            <Card key={card.id} card={card} toggleToPlay={this.props.toggleToPlay}/>
         )).sort(
             function (x, y) {
-                //I wanted this to be a helper function but didnt feel like figuring out how to do it rn
-                if ((game.trumpSuit !== x.props.card.suit || x.props.card.suit !== "Trump") && (game.trumpSuit === y.props.card.suit || x.props.card.suit === "Trump"))
+                if ((x.props.card.isTrump) && (!y.props.card.isTrump))
                     return -1;
 
-                if ((game.trumpSuit === x.props.card.suit || x.props.card.suit === "Trump") && (game.trumpSuit !== y.props.card.suit || x.props.card.suit !== "Trump"))
+                else if ((!x.props.card.isTrump) && (y.props.card.isTrump))
                     return 1;
 
-                //Relies on the fact that trump order is alphabetical and t is after s
-                if (x.props.card.suit < y.props.card.suit)
-                    return -1;
-                if (x.props.card.suit > y.props.card.suit)
-                    return 1;
+                else if ((x.props.card.isTrump) && (y.props.card.isTrump)) {
+                    var pairX = ordering[x.props.card.suit];
+                    var pairY = ordering[y.props.card.suit];
+
+                    return (y.props.card.value + pairY) - (x.props.card.value + pairX);
+                }
+
+                if (x.props.card.suit !== y.props.card.suit)
+                    return ordering[y.props.card.suit] - ordering[x.props.card.suit];
                 
-                return x.props.card.value - y.props.card.value;
+                return y.props.card.value - x.props.card.value;
             }
         );
     }
