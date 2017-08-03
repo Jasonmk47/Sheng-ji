@@ -9,8 +9,6 @@ GameFactory.createGame = function(playerIds, gameType){
   var deck    = createDeck(gameType),
       players = createPlayers(playerIds); 
 
-  GameFactory.dealPlayers(players, deck);
-
   return {
     //Maybe add a field for unique game id? As of now this is unique because of db id
     deck: deck,   // bottom  
@@ -21,7 +19,11 @@ GameFactory.createGame = function(playerIds, gameType){
     gameType: gameType,
     trumpNum: 2,
     trumpSuit: "trump",
+    recievesBottom: null,
+    hasDealtCards: false,
     hasCalledSuit: false,
+    hasSetBottom: false,
+    isRoundStarted: false,
     roundNumber: 1,
     currentHand: {
       shownCards: [],   // dict of playerID + cards played
@@ -36,14 +38,6 @@ GameFactory.createGame = function(playerIds, gameType){
     finished: -1
   };
 };
-
-GameFactory.dealPlayers = function(players, deck){
-  for (var i = 0; i < deck.length - 8; i){  //8 for the bottom. Don't increment the for loop
-    Object.keys(players).forEach(function(id){
-      players[id].hand.push(deck.shift()); // eventually will want to add in some delay logic
-    });
-  }
-}
 
 function createPlayers(ids){
   var o = {};
@@ -72,7 +66,7 @@ function createDeck(gameType){
     // Ace is 14 for value ordering
     suits.forEach(function(suit){
       for (var i=2; i<=14; i++){
-        var name = i;
+        var name = ''+i;
         var isTrump = false;
         if (i === 2) isTrump = true;
         if (i === 14)  name = 'ace';

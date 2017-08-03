@@ -53,8 +53,14 @@ export default class Hand extends Component {
                     return 1;
 
                 else if ((x.props.card.isTrump) && (y.props.card.isTrump)) {
-                    var pairX = ordering[x.props.card.suit];
+                    var pairX = ordering[x.props.card.suit]; //pairs the trump 2s
                     var pairY = ordering[y.props.card.suit];
+
+                    if (game.trumpNum === x.props.card.value || x.props.card.value > 14)
+                        pairX += 100;
+
+                    if (game.trumpNum === y.props.card.value || y.props.card.value > 14)
+                        pairY += 100;
 
                     return (y.props.card.value + pairY) - (x.props.card.value + pairX);
                 }

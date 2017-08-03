@@ -227,6 +227,32 @@ class App extends Component {
         this.setState({inGame: false, selectedUsers: [], selectedGames: [], play: []})
     }
 
+    dealCards(event) {
+        event.preventDefault();
+        console.log("dealing cards");
+
+        Meteor.call("games.dealCards", this.state.currentGameId);
+    }
+
+    callSuit(event){
+        event.preventDefault();
+        console.log("setting suit");
+         
+        Meteor.call('games.callSuit', this.state.play[0], this.state.currentGameId);
+    }
+
+    setBottom(event) {
+        event.preventDefault();
+        console.log("setting bottom");
+
+        if (this.state.play.length !== 8) {
+            console.log("Not right amount of cards selected");
+        }
+        else {
+            Meteor.call('games.setBottom', this.state.play, this.state.currentGameId);
+        }
+    }
+
     render() {
         return (
             <div className="container">
@@ -239,10 +265,49 @@ class App extends Component {
                 {this.state.inGame ? 
                 <div>
                     {this.props.games.find( //This looks ugly, should format it better
-                        game => {if(game._id == this.state.currentGameId ) return game;}).currentHand.currentPlayer === this.props.currentUser._id ?
+                        game => {if(game._id === this.state.currentGameId ) return game;}).currentHand.currentPlayer === this.props.currentUser._id ?
                         <div>GO!!! It's your turn</div> : <div>It's not your turn</div>}
+
+                    { this.props.games.find( //This looks ugly, should format it better
+                        game => {if(game._id === this.state.currentGameId ) return game;}).hasDealtCards ?
+                    <div /> :
+                    <form className="deal-cards" onSubmit={this.dealCards.bind(this)}>
+                        <input
+                            type='submit'
+                            value="Deal cards"
+                            name="deal-cards"
+                        />
+                    </form>
+                    }
+
                     {this.renderTable()}
                     {this.renderHand()}
+                    { this.props.games.find( //This looks ugly, should format it better
+                        game => {if(game._id === this.state.currentGameId ) return game;}).hasCalledSuit ?
+                    <div /> :
+                    <form className="call-suit" onSubmit={this.callSuit.bind(this)}>
+                        <input
+                            type='submit'
+                            value="Call Suit"
+                            name="call-suit"
+                        />
+                    </form>
+                    }
+                    <br />
+                    { this.props.games.find( //This looks ugly, should format it better
+                        game => {if(game._id === this.state.currentGameId ) return game;}).recievesBottom !== this.props.currentUser._id ?
+                    <div /> :
+                    <form className="set-bottom" onSubmit={this.setBottom.bind(this)}>
+                        <input
+                            type='submit'
+                            value="Set Bottom"
+                            name="set-bottom"
+                        />
+                    </form>
+                    }
+
+
+                    <br />
                 </div>
                 :
                 <div className="start-game">

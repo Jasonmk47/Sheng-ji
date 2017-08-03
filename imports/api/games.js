@@ -32,7 +32,10 @@ game = {
     gameType: string,   
     trumpNum: int,
     trumpSuit: string,
+    recievesBottom: string,
+    hasDealtCards: bool,
     hasCalledSuit: bool,
+    hasSetBottom: bool,
     roundNumber: int,
     currentHand: {
       shownCards: [],     // dict of playerID + cards played
@@ -50,6 +53,11 @@ game = {
 
 Meteor.methods({
   'games.createGame'(player2, player3, player4) {
+    // Make sure the user is logged in
+    if (! Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+
     check(player2, String);
     check(player3, String);
     check(player4, String);
@@ -60,7 +68,68 @@ Meteor.methods({
   },
 
   'games.delete'(gameId) {
-      Games.remove({_id: gameId});
+    // Make sure the user is logged in
+    if (! Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+    Games.remove({_id: gameId});
+  },
+
+  'games.callSuit'(card, gameId) {
+    // Make sure the user is logged in
+
+    if (! Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+
+    check(card, {
+      id: Number,
+      isTrump: Boolean,
+      name: String,
+      suit: String,
+      value: Number
+    });
+    check(gameId, String);
+
+    var game = Games.findOne({_id: gameId});
+    if (game.hasCalledSuit) throw new Meteor.Error('already called suit');
+    if (card.value !== game.trumpNum) throw new Meteor.Error('not a trump card');;
+
+    //Race conditions here?
+    game.hasCalledSuit = true;
+    game.trumpSuit = card.suit;
+    game.deck.forEach((c) => {if (c.suit === card.suit) c.isTrump = true;});
+    Object.keys(game.players).forEach(function(id){
+      game.players[id].hand.forEach((c) => {if (c.suit === card.suit) c.isTrump = true;});
+    });
+
+    Games.update( gameId, game );
+    console.log(game);
+  },
+
+  'games.setBottom'(cards, gameId) {
+    // Make sure the user is logged in
+    if (! Meteor.userId()) {
+      throw new Meteor.Error('not-authorized');
+    }
+    check(card, [{
+      id: Number,
+      isTrump: Boolean,
+      name: String,
+      suit: String,
+      value: Number
+    }]);
+    check(gameId, String);
+
+    var game = Games.findOne({_id: gameId});
+
+    if (game.hasSetBottom) console.log("must be a flip");
+
+    game.hasSetBottom = true;
+    game.deck = cards;
+
+    Games.update( gameId, game );
+    console.log(game);
   },
 
   'games.checkCards'(cards, gameId, userId) {
