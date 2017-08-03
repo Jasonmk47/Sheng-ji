@@ -17,6 +17,7 @@ GameFactory.createGame = function(playerIds, gameType){
     startingPlayer: playerIds[0],
     players: players,
     gameType: gameType,
+    dealerIncrement: 0,
     trumpNum: 2,
     trumpSuit: "trump",
     recievesBottom: null,

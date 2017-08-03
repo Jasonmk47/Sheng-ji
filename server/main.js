@@ -32,9 +32,8 @@ Meteor.publish("users", function(){ //Change this to a friends list at some poin
 	var currentUserId = this.userId;
 
 	if (currentUserId)
-		return Meteor.users.find();
+		return Meteor.users.find(); //To make into a friends list search for users friends instead of all users
 });
-
 
 Meteor.methods({
   'games.dealCards'(gameId) {
@@ -45,25 +44,32 @@ Meteor.methods({
 
       var game = Games.findOne({_id: gameId});
 
-      if (game.hasCalledSuit || game.hasSetBottom || game.isRoundStarted) throw new Meteor.Error("Game should have started already");
+      if (game.hasCalledSuit || game.hasSetBottom || game.isRoundStarted) {
+      	throw new Meteor.Error("Game should have started already");
+      }
 
       game.hasDealtCards = true;
       Games.update( gameId, game );
 
-      console.log("trying to deal out");
-
       let dealOneCard = () => {
-      console.log("test")
-        Object.keys(game.players).forEach(function(id){
-          game.players[id].hand.push(game.deck.shift());});
+				game = Games.findOne({_id: gameId});
 
-        Games.update( gameId, game );
+	      console.log(game.dealerIncrement);
+	      console.log(game.playerIds)
 
-        if (0 === game.deck.length - 8) 
-          Meteor.clearInterval(myInterval);
-      };
+        game.players[game.playerIds[game.dealerIncrement]].hand.push(game.deck.shift());
+	 			
+        game.dealerIncrement++;
+        game.dealerIncrement = game.dealerIncrement % game.playerIds.length;
 
-      var myInterval = Meteor.setInterval(dealOneCard, 1000);
+	      Games.update( gameId, game );
 
-  },}
-);
+	      if (0 === game.deck.length - 8) {
+	        Meteor.clearInterval(myInterval);
+	      }
+	    };
+     
+      var myInterval = Meteor.setInterval(dealOneCard, 250);
+
+	}
+});

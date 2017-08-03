@@ -11,16 +11,16 @@ export const Games = new Mongo.Collection('games');
 // Types of the fields of the objects //
 /*
 card = {
-  id: int,                //Individual id per card
+  id: Number,                //Individual id per card
   suit: string,           //suit or Trump
-  value: int,
+  value: Number,
   name: string
 };
 
 player = {
   hand: [card],
-  points: int,
-  overallScore: int,      //On 2s to start
+  points: Number,
+  overallScore: Number,      //On 2s to start
 };
 
 game = {
@@ -30,13 +30,14 @@ game = {
     startingPlayer: string,
     players: {},          //Object with all of the players keyed by id
     gameType: string,   
-    trumpNum: int,
+    dealerIncrement, Number,
+    trumpNum: Number,
     trumpSuit: string,
     recievesBottom: string,
     hasDealtCards: bool,
     hasCalledSuit: bool,
     hasSetBottom: bool,
-    roundNumber: int,
+    roundNumber: Number,
     currentHand: {
       shownCards: [],     // dict of playerID + cards played
       currentPlayer: string,
@@ -47,7 +48,7 @@ game = {
 
     inProgress: bool,
     started: Date,
-    finished: int 
+    finished: Number 
   };
 */
 
