@@ -12,7 +12,6 @@ Getting started
 -You will see the users appear in a list.
 -Select them and click create a game, the play order will be in the order you selected them.
 -Select the game that just appeared and click start game
--Clicking on the cards selects them and plays when the submit button is clicked
 
 
 DB management
@@ -25,16 +24,12 @@ DB management
 
 
 FEATURES TODO:
-	Game logic - Figure out how to deal the cards slowly over time for calling trump suit
-				 How to call a trump suit
-				 Setting the bottom
-				 Flipping suit
-				 Playing shuai
+	Game logic - Policing shuai
 				 Going between rounds
 				 Winning overall
 
-	Meta topics - Game management (Friends list? Generate room where you are added once you join?)
-				  Timer to make people play faster
+	Meta topics - Friends list / Rooms to join
+				  Timer to make people play faster (bonus)
 
 	Graphics - Have orientation of cards flipped for preference (bonus)
 
@@ -46,11 +41,7 @@ KNOWN BUGS:
 -If you select a game and someone else deletes it, you have to refresh the page else you cannot start a game
 -Occasionally, selecting cards doesn't work and you have to refresh the page (I have no idea why this happens, I thought this issue should be fixed)
 -You can play shuais but the game never rejects them and doesn't know how to score/check validity correctly
--I'm pretty sure shuaing trump doesn't work
--Trump number doesn't behave as trump
 
-
-
-QUESTION:
+QUESTIONS:
 -If you shuai and you get rekt by someone else, how do we show the cards you tried + who can beat you?
 -Do we want an undo button?

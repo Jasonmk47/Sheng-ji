@@ -2,7 +2,8 @@ GameFactory = {};
 
 var gameProperties = {
 "4p2d": {playerCount: 4, deckCount: 2 },
-//"4p1d": {playerCount: 4, deckCount: 1 },
+"4p1d": {playerCount: 4, deckCount: 1 }, //Has not been tested
+"5p2d": {playerCount: 5, deckCount: 2 }, //No idea if this works
 }
 
 GameFactory.createGame = function(playerIds, gameType){
@@ -10,33 +11,42 @@ GameFactory.createGame = function(playerIds, gameType){
       players = createPlayers(playerIds); 
 
   return {
-    //Maybe add a field for unique game id? As of now this is unique because of db id
-    deck: deck,   // bottom  
-    plays: [],    // To record past plays
+    //Game specific
     playerIds: playerIds,
-    startingPlayer: playerIds[0],
     players: players,
     gameType: gameType,
-    dealerIncrement: 0,
+    inProgress: true,
+    started: new Date(),
+    finished: -1,
+
+    //Round specific
+    roundNumber: 1,
     trumpNum: 2,
     trumpSuit: "trump",
-    recievesBottom: null,
-    hasDealtCards: false,
-    hasCalledSuit: false,
-    hasSetBottom: false,
-    isRoundStarted: false,
-    roundNumber: 1,
+
+    startingPlayer: null,
+
+    //Game Info
+    deck: deck,   // bottom  
     currentHand: {
       shownCards: [],   // dict of playerID + cards played
-      currentPlayer: playerIds[0],
+      currentPlayer: null,
       pattern: null, 
       suit: null
     },
     previousHands: [],
-    // metadata
-    inProgress: true,
-    started: new Date(),
-    finished: -1
+
+    //Helper information
+    dealerIncrement: 0,
+
+    hasCalledSuit: false,
+    whoCalled: null, //For reinforcing
+    hasDealtCards: false,
+    hasBeenFlipped: false, //For flipping hierarchy
+
+    settingBottom: null, //id of player currently setting the bottom
+    queueToAskFlip: ['dummy'], //gets filled when bottom is set, dummy so that play isn't availble immediately
+
   };
 };
 
