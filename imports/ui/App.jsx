@@ -263,7 +263,7 @@ class App extends Component {
 		var game = this.props.games.find(
 				game => {if(game._id === this.state.currentGameId ) return game;})
 
-		if (this.state.play.lengh !== 2){
+		if (this.state.play.length !== 2){
 			console.log("Not the right number of cards");
 		}
 		else if (this.state.play[0].value !== this.state.play[1].value) {

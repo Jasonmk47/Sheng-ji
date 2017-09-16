@@ -49,7 +49,6 @@ Meteor.methods({
 		if (card.value !== game.trumpNum) throw new Meteor.Error('not a trump card');;
 
 		//Race conditions here?
-
 		if (!game.whoCalled) game.whoCalled = Meteor.userId();
 
 		game.trumpSuit = card.suit;
@@ -83,7 +82,6 @@ Meteor.methods({
 			Games.update( gameId, game );
 		}
 		else if (cards.length === 2) {
-
 			if (cards[0].value !== cards[1].value || cards[0].suit !== cards[1].suit) throw new Meteor.Error('Not a pair');
 
 			//Make sure the order of suit is correct
@@ -94,9 +92,16 @@ Meteor.methods({
 			}
 			else { game.hasBeenFlipped = true; }
 
+			//Remove the trump suit status from other cards
+			game.deck.forEach((c) => {if (c.suit === game.trumpSuit && c.value !== game.trumpNum) c.isTrump = false;});
+			Object.keys(game.players).forEach(function(id){
+				game.players[id].hand.forEach((c) => {if (c.suit === game.trumpSuit && c.value !== game.trumpNum) c.isTrump = false;});
+			});
+
 			Meteor.call('games.callSuit', cards[0], gameId);
 
-			games.queueToAskFlip.shift();
+
+			game.queueToAskFlip.shift();
 			Games.update( gameId, game );
 
 		}
@@ -544,10 +549,130 @@ Meteor.methods({
 			//Restart the game and increment player score
 			console.log("game is done")
 
+			//Figure out overall winner
 			//Display the final score
+			let defendersStarted = null;
+			let assignedTeam = false;
+			let startingPlayerIndex = null;
+			let i = 0;
+			let team1 = 0;
+			let team2 = 0;
+
 			Object.keys(game.players).forEach(function(id){
-				console.log(game.players[id]);
+
+				if (!assignedTeam && game.players[id] === game.startingPlayer) {
+					assignedTeam = true;
+					startingPlayerIndex = i;
+					if (i%2 === 0) {defendersStarted = true;}
+					else {defendersStarted = false;}
+				}
+
+
+				if (i%2 === 0) {
+					team1+=game.players[id].points;
+				}
+				else {
+					team2+=game.players[id].points;
+				}
+
+				i++;
 			});
+
+			let attackingScore = defendersStarted ? team2 : team1;
+
+			//Double the bottom
+			game.deck.forEach((card)=>{
+				if (card.value === 5) {          // check for 5, 10, K
+					attackingScore += 10; 
+				} else if (card.value === 10 || card.value === 13) {
+					attackingScore += 20
+				}	
+			});
+			
+			//Increment score of appropriate players
+			var victoryPoints = 0;
+			var attackersWon = attackingScore >= 80 ? true : false;
+
+			//Shutout
+			if (attackingScore === 0) {
+				console.log("lol");
+				victoryPoints = 3;
+			}
+			else if (attackingScore < 40) {
+				victoryPoints = 2;
+			}
+			else if (attackingScore < 80) {
+				victoryPoints = 1;
+			}
+			else if (attackingScore < 120) {
+				victoryPoints = 0;
+			}
+			else if (attackingScore < 160) {
+				victoryPoints = 1;
+			}
+			else if (attackingScore < 200) {
+				victoryPoints = 2;
+			}
+			else if (attackingScore < 240) {
+				victoryPoints = 3;
+			}
+			else if (attackingScore < 280) {
+				victoryPoints = 4;
+			}	
+			//Max points of 280
+			else {
+				console.log("Waow");
+				victoryPoints = 5;
+			}
+
+			const nextStartingPlayerIndex = attackersWon ? (startingPlayerIndex + 1) % 4 : (startingPlayerIndex + 2) % 4;
+			i = 0;
+			//Set player variables
+			Object.keys(game.players).forEach(function(id){
+				//Set game variables based off players
+				if (i === nextStartingPlayerIndex) {
+					game.startingPlayer = id;
+					let nextTrumpNum = game.players[id].overallScore;
+				}
+
+				game.players[id].points = 0;
+				if (i%2===1&&attackersWon) {
+					game.players[id].overallScore += victoryPoints;
+				}
+				else if (i%2===0&&!attackersWon) {
+					game.players[id].overallScore += victoryPoints;
+				}
+				game.players[id].hand = [];
+			});
+			
+			//Reset game variables
+
+
+			//Remove the trump suit status from other cards
+			game.deck.forEach((c) => {if (c.suit === game.trumpSuit || c.value === game.trumpNum) c.isTrump = false;});
+			Object.keys(game.players).forEach(function(id){
+				game.players[id].hand.forEach((c) => {if (c.suit === game.trumpSuit || c.value === game.trumpNum) c.isTrump = false;});
+			});
+
+			game.trumpNum = nextTrumpNum;
+
+			game.previousHands = [];
+
+			game.roundNumber++;
+			game.trumpSuit = "trump";
+
+			game.dealerIncrement = 0;
+
+			game.hasCalledSuit = false;
+			game.whoCalled = null;
+			game.hasDealtCards = false;
+			game.hasBeenFlipped = false;
+			
+			game.isDealing = false;
+
+			game.settingBottom = null;
+			game.queueToAskFlip = ["dummy"];
+			
 
 		}
 

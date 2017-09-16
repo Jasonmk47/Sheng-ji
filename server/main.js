@@ -35,65 +35,76 @@ Meteor.publish("users", function(){ //TODO: Change this to a friends list at som
 		return Meteor.users.find(); //To make into a friends list search for users friends instead of all users
 });
 
+var myInterval; //This needs some gigantic scope to work. Could put it on the game object
+
 Meteor.methods({
 	'games.dealCards'(gameId) {
 		if (! Meteor.userId()) {
 			throw new Meteor.Error('not-authorized');
 		}
-			check(gameId, String);
+		check(gameId, String);
 
-			var game = Games.findOne({_id: gameId});
+		var game = Games.findOne({_id: gameId});
 
-			let dealOneCard = () => {
-				game = Games.findOne({_id: gameId});
+		let dealOneCard = () => {
+			game = Games.findOne({_id: gameId});
 
-				//For the first round
-				if (!game.startingPlayer && game.deck[0].value === 2) {
-					game.startingPlayer = game.playerIds[game.dealerIncrement];
-					game.currentHand.currentPlayer = game.startingPlayer;
-					game.settingBottom = game.startingPlayer;
-					game.whoCalled = game.startingPlayer;
-					
-					game.hasCalledSuit = true;
-					
-					var card = game.deck[0];
-					game.trumpSuit = card.suit;
-					game.deck.forEach((c) => {if (c.suit === card.suit) c.isTrump = true;});
-					Object.keys(game.players).forEach(function(id){
-						game.players[id].hand.forEach((c) => {if (c.suit === card.suit) c.isTrump = true;});
-					});
-				}
-
-				//Insert card into hand
-				game.players[game.playerIds[game.dealerIncrement]].hand.push(game.deck.shift());
+			//For the first round
+			if (!game.startingPlayer && game.deck[0].value === 2) {
+				game.startingPlayer = game.playerIds[game.dealerIncrement];
+				game.currentHand.currentPlayer = game.startingPlayer;
+				game.settingBottom = game.startingPlayer;
+				game.whoCalled = game.startingPlayer;
 				
-				//Move dealer
-				game.dealerIncrement++;
-				game.dealerIncrement = game.dealerIncrement % game.playerIds.length;
+				game.hasCalledSuit = true;
+				
+				var card = game.deck[0];
+				game.trumpSuit = card.suit;
+				game.deck.forEach((c) => {if (c.suit === card.suit) c.isTrump = true;});
+				Object.keys(game.players).forEach(function(id){
+					game.players[id].hand.forEach((c) => {if (c.suit === card.suit) c.isTrump = true;});
+				});
+			}
 
-				//End of dealing
-				if (0 === game.deck.length - 8) {
-					Meteor.clearInterval(myInterval);
+			//Insert card into hand
+			game.players[game.playerIds[game.dealerIncrement]].hand.push(game.deck.shift());
+			
+			//Move dealer
+			game.dealerIncrement++;
+			game.dealerIncrement = game.dealerIncrement % game.playerIds.length;
 
-					game.hasDealtCards = true;
-					
-					//Adding bottom to the person who should
-					game.players[game.startingPlayer].hand = game.players[game.startingPlayer].hand.concat(game.deck);
-					game.deck = [];
+			//End of dealing
+			if (0 === game.deck.length - 8) {
+				Meteor.clearInterval(myInterval);
+
+				game.hasDealtCards = true;
+				
+				//If no one calls then the bottom has to get it
+				//As of now it's just wujiang
+				if (!game.hasCalledSuit) {
+					//game.startingPlayer
+
+
 				}
 
-				Games.update( gameId, game );
-			};
+				//Adding bottom to the person who should
+				game.players[game.startingPlayer].hand = game.players[game.startingPlayer].hand.concat(game.deck);
+				game.deck = [];
+			}
 
-		//TODO: pause
-		if (myInterval) {
-			console.log("pausing")
+			Games.update( gameId, game );
+		};
+
+
+		if (game.isDealing) {
 			Meteor.clearInterval(myInterval);
+			game.isDealing = false;
 		}
 		else {
-			var myInterval = Meteor.setInterval(dealOneCard, 250);
-		}
-
+			myInterval = Meteor.setInterval(dealOneCard, 250);
+			game.isDealing = true;
+		}	
+		Games.update( gameId, game );
 	},
 
 });

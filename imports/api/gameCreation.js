@@ -1,10 +1,11 @@
+
 GameFactory = {};
 
 var gameProperties = {
 "4p2d": {playerCount: 4, deckCount: 2 },
 "4p1d": {playerCount: 4, deckCount: 1 }, //Has not been tested
-"5p2d": {playerCount: 5, deckCount: 2 }, //No idea if this works
 }
+
 
 GameFactory.createGame = function(playerIds, gameType){
   var deck    = createDeck(gameType),
@@ -23,7 +24,6 @@ GameFactory.createGame = function(playerIds, gameType){
     roundNumber: 1,
     trumpNum: 2,
     trumpSuit: "trump",
-
     startingPlayer: null,
 
     //Game Info
@@ -34,6 +34,7 @@ GameFactory.createGame = function(playerIds, gameType){
       pattern: null, 
       suit: null
     },
+    //Not certain this is useful
     previousHands: [],
 
     //Helper information
@@ -43,6 +44,8 @@ GameFactory.createGame = function(playerIds, gameType){
     whoCalled: null, //For reinforcing
     hasDealtCards: false,
     hasBeenFlipped: false, //For flipping hierarchy
+
+    isDealing: false,
 
     settingBottom: null, //id of player currently setting the bottom
     queueToAskFlip: ['dummy'], //gets filled when bottom is set, dummy so that play isn't availble immediately
