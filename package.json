@@ -9,6 +9,8 @@
     "bcrypt": "^1.0.2",
     "classnames": "^2.2.5",
     "meteor-node-stubs": "~0.2.0",
+    "mobx": "^3.4.1",
+    "mobx-react": "^4.3.5",
     "react": "^15.5.4",
     "react-addons-create-fragment": "^15.5.3",
     "react-addons-css-transition-group": "^15.5.2",
